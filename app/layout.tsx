@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://flyclim.com',
+    url: 'https://www.flyclim.com',
     siteName: 'FlyClim Storm Viewer',
     title: 'FlyClim Storm Viewer | AI-Powered Weather Optimization',
     description: 'FlyClim helps airlines reduce costly weather-related delays with predictive routing intelligence—saving time, fuel, and operational costs.',
@@ -101,7 +101,7 @@ export default function RootLayout({
             })(window,document,'script','dataLayer','GTM-XXXXXXX');
           `}
         </Script>
-        
+
         {/* HubSpot */}
         <Script id="hs-script-loader" async defer src="//js.hs-scripts.com/145986844.js" />
         {/* Google Analytics */}
