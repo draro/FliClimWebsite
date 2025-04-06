@@ -14,6 +14,7 @@ export function Navigation() {
   const navItems = [
     { label: 'About', href: '/about' },
     { label: 'Solutions', href: '/solutions' },
+    { label: 'Team', href: '/team' },
     { label: 'Pilot Program', href: '/pilot-program' },
     { label: 'Contact', href: '/contact' },
   ];
@@ -46,11 +47,10 @@ export function Navigation() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive(item.href)
-                    ? 'text-blue-600'
-                    : 'text-gray-700 hover:text-blue-600'
-                }`}
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive(item.href)
+                  ? 'text-blue-600'
+                  : 'text-gray-700 hover:text-blue-600'
+                  }`}
               >
                 {item.label}
               </Link>
@@ -83,11 +83,10 @@ export function Navigation() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`block px-3 py-2 rounded-md text-base font-medium ${
-                  isActive(item.href)
-                    ? 'text-blue-600'
-                    : 'text-gray-700 hover:text-blue-600'
-                }`}
+                className={`block px-3 py-2 rounded-md text-base font-medium ${isActive(item.href)
+                  ? 'text-blue-600'
+                  : 'text-gray-700 hover:text-blue-600'
+                  }`}
                 onClick={() => setIsOpen(false)}
               >
                 {item.label}
