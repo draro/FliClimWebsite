@@ -25,7 +25,14 @@ interface RouteResponse {
     fpl_string: string;
   };
 }
+type Coordinate = [number, number];
 
+interface SafePoint {
+  coordinates: number[];
+  time: Date;
+  style: Record<string, any>;
+  properties: Record<string, any>;
+}
 export default function CesiumViewer() {
   const viewerRef = useRef<any>(null);
   const stormCache = useRef<Record<string, any>>({});
@@ -56,7 +63,7 @@ export default function CesiumViewer() {
     window.Cesium.Model.fromGltfAsync({
       url: '/models/Cesium_Air.glb',
       scale: 1.0
-    }).catch(error => {
+    }).catch((error: any) => {
       console.warn('Failed to preload aircraft model:', error);
     });
 
@@ -82,7 +89,7 @@ export default function CesiumViewer() {
       console.warn('❌ Invalid date provided to roundTo5Minutes:', date);
       return new Date().toISOString();
     }
-    
+
     const roundedTime = Math.floor(date.getTime() / (5 * 60 * 1000)) * 5 * 60 * 1000;
     return new Date(roundedTime).toISOString();
   };
@@ -107,15 +114,15 @@ export default function CesiumViewer() {
       const res = await fetch(`https://demo.flyclim.com/api/storms?from_time=${isoTime}`, {
         signal: controller.signal
       });
-      
+
       clearTimeout(timeoutId);
-      
+
       if (!res.ok) return null;
       const geojson = await res.json();
       if (!geojson.features || geojson.features.length === 0) return null;
       stormCache.current[isoTime] = geojson;
       return geojson;
-    } catch (err) {
+    } catch (err: any) {
       if (err.name === 'AbortError') {
         console.warn('Storm fetch timed out after 3 minutes');
       } else {
@@ -144,15 +151,15 @@ export default function CesiumViewer() {
     // Process each storm feature and create 3D volumes
     for (const feature of geojson.features) {
       if (feature.geometry.type === 'Polygon') {
-        const coordinates = feature.geometry.coordinates[0];
+        const coordinates = feature.geometry.coordinates[0] as Coordinate[];
         const baseHeight = 600; // Base height in meters
         const topHeight = Math.random() * (12000 - 9500) + 9500; // Random height between 9500 and 12000 meters
-        
+
         // Create the walls of the storm
         for (let i = 0; i < coordinates.length - 1; i++) {
           const [lon1, lat1] = coordinates[i];
           const [lon2, lat2] = coordinates[i + 1];
-          
+
           // Create a wall between two points
           const wall = viewerRef.current.entities.add({
             wall: {
@@ -173,10 +180,10 @@ export default function CesiumViewer() {
         }
 
         // Create top and bottom polygons
-        const positions = coordinates.map(([lon, lat]) => 
+        const positions = (coordinates as [number, number][]).map(([lon, lat]: any) =>
           window.Cesium.Cartesian3.fromDegrees(lon, lat, topHeight)
         );
-        const bottomPositions = coordinates.map(([lon, lat]) => 
+        const bottomPositions = coordinates.map(([lon, lat]: any) =>
           window.Cesium.Cartesian3.fromDegrees(lon, lat, baseHeight)
         );
 
@@ -211,31 +218,31 @@ export default function CesiumViewer() {
     try {
       const dofMatch = fpl.match(/DOF\/(\d{6})/);
       const timeMatch = fpl.match(/-([A-Z]{4})(\d{4})/);
-      
+
       if (!timeMatch) return null;
-      
+
       const time = timeMatch[2];
       const hours = parseInt(time.slice(0, 2));
       const minutes = parseInt(time.slice(2));
-      
+
       let departureDate: Date;
-      
+
       if (dofMatch) {
         const dof = dofMatch[1];
         const year = 2000 + parseInt(dof.slice(0, 2));
         const month = parseInt(dof.slice(2, 4)) - 1;
         const day = parseInt(dof.slice(4, 6));
-        
+
         departureDate = new Date(Date.UTC(year, month, day, hours, minutes));
       } else {
         departureDate = new Date();
         departureDate.setUTCHours(hours, minutes, 0, 0);
-        
+
         if (departureDate < new Date()) {
           departureDate.setUTCDate(departureDate.getUTCDate() + 1);
         }
       }
-      
+
       return departureDate;
     } catch (err) {
       console.warn('Failed to parse FPL time:', err);
@@ -245,7 +252,7 @@ export default function CesiumViewer() {
 
   const createBillboard = (position: any, style: any, properties: any) => {
     const viewer = viewerRef.current;
-    
+
     const fallbackPoint = {
       position,
       label: {
@@ -315,7 +322,7 @@ export default function CesiumViewer() {
           style: f.properties.style || {},
           properties: f.properties
         }))
-        .filter(p => p.time !== null)
+        .filter((p): p is SafePoint => p.time !== null)
         .sort((a, b) => a.time.getTime() - b.time.getTime());
 
       const property = new window.Cesium.SampledPositionProperty();
@@ -323,7 +330,7 @@ export default function CesiumViewer() {
       safePoints.forEach((point, index) => {
         const [lon, lat] = point.coordinates;
         const position = safeFromDegrees(lon, lat, 10600);
-        
+
         if (position) {
           createBillboard(position, point.style, point.properties);
           const julianDate = window.Cesium.JulianDate.fromDate(point.time);
@@ -332,7 +339,7 @@ export default function CesiumViewer() {
       });
 
       const stopJulian = window.Cesium.JulianDate.fromDate(safePoints[safePoints.length - 1].time);
-      
+
       viewer.clock.startTime = startJulian.clone();
       viewer.clock.currentTime = startJulian.clone();
       viewer.clock.stopTime = stopJulian.clone();

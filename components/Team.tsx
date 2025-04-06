@@ -95,7 +95,7 @@ export function Team() {
                                             <Linkedin className="h-6 w-6" />
                                         </Link>
                                     )}
-                                    {ceo.social.twitter && (
+                                    {/* {ceo.social.twitter && (
                                         <Link
                                             href={ceo.social.twitter}
                                             target="_blank"
@@ -103,7 +103,7 @@ export function Team() {
                                         >
                                             <Twitter className="h-6 w-6" />
                                         </Link>
-                                    )}
+                                    )} */}
                                 </div>
                             </div>
                         </div>

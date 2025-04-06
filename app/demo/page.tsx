@@ -19,6 +19,8 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Label } from '@/components/ui/label';
+import emailjs from '@emailjs/browser';
+import { useToast } from "@/hooks/use-toast";
 
 const CesiumViewer = dynamic(
   () => import('@/components/CesiumViewer').then(mod => mod.default),
@@ -36,6 +38,7 @@ const CesiumViewer = dynamic(
 );
 
 export default function DemoPage() {
+  const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
   const [formData, setFormData] = useState({
@@ -46,6 +49,7 @@ export default function DemoPage() {
     acceptTerms: false
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -53,7 +57,7 @@ export default function DemoPage() {
 
   const validateForm = () => {
     const errors: Record<string, string> = {};
-    
+
     if (!formData.firstName.trim()) errors.firstName = 'First name is required';
     if (!formData.lastName.trim()) errors.lastName = 'Last name is required';
     if (!formData.email.trim()) {
@@ -142,12 +146,42 @@ export default function DemoPage() {
     driverObj.drive();
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (validateForm()) {
-      // Here you could send the form data to your backend
-      console.log('Form data:', formData);
-      setShowIntro(false);
-      startTour();
+      setIsSubmitting(true);
+
+      try {
+        await emailjs.send(
+          'service_c2sgsml',
+          'template_oboeia9',
+          {
+            from_name: `${formData.firstName} ${formData.lastName}`,
+            from_email: formData.email,
+            company: formData.company,
+            subject: 'Demo Access Request',
+            message: `New demo access request from ${formData.company}.`,
+            to_email: 'davide@flyclim.com'
+          },
+          'M6qeI5v5CtMA9WGRb'
+        );
+
+        toast({
+          title: "Success!",
+          description: "Your demo access request has been sent.",
+        });
+
+        setShowIntro(false);
+        startTour();
+      } catch (error) {
+        console.error('Failed to send email:', error);
+        toast({
+          title: "Error",
+          description: "Failed to submit request. Please try again later.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -257,7 +291,6 @@ export default function DemoPage() {
                   <h3 className="font-semibold mb-2">Please note:</h3>
                   <ul className="list-disc list-inside space-y-2 text-sm">
                     <li>This is a simplified version of our full platform</li>
-                    {/* <li>Storm data is simulated for demonstration purposes</li> */}
                     <li>Some features may be limited or unavailable</li>
                   </ul>
                 </div>
@@ -265,14 +298,18 @@ export default function DemoPage() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button onClick={handleSubmit} className="w-full">
-              Start Demo
+            <Button
+              onClick={handleSubmit}
+              className="w-full"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Sending...' : 'Start Demo'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
@@ -287,7 +324,7 @@ export default function DemoPage() {
           <HelpCircle className="h-4 w-4" />
         </Button>
         <Link href="/" passHref>
-          <Button 
+          <Button
             variant="outline"
             className="bg-white/95 hover:bg-white border-blue-100 hover:border-blue-200 shadow-lg backdrop-blur-sm flex items-center gap-2 transition-all duration-300 hover:scale-105"
           >
@@ -296,7 +333,7 @@ export default function DemoPage() {
           </Button>
         </Link>
         <Link href="/" passHref>
-          <Button 
+          <Button
             size="icon"
             variant="outline"
             className="bg-white/95 hover:bg-white border-blue-100 hover:border-blue-200 shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-105"

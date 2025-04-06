@@ -86,7 +86,7 @@ export function FPLForm({ onVisualize, onLoad, routeData }: FPLFormProps) {
 
       const data = await res.json();
       onVisualize(data, fpl);
-    } catch (error) {
+    } catch (error: any) {
       if (error.name === 'AbortError') {
         alert('Request timed out after 3 minutes. Please try again.');
       } else {
@@ -141,8 +141,8 @@ export function FPLForm({ onVisualize, onLoad, routeData }: FPLFormProps) {
               disabled={isSubmitting}
             />
             <div className="flex gap-2">
-              <Button 
-                onClick={submitFPL} 
+              <Button
+                onClick={submitFPL}
                 className="flex-1 bg-blue-600 hover:bg-blue-700"
                 disabled={isSubmitting}
               >
@@ -151,9 +151,9 @@ export function FPLForm({ onVisualize, onLoad, routeData }: FPLFormProps) {
               {routeData?.properties?.risk_factors && (
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button 
+                    <Button
                       id="viewRisksButton"
-                      variant="outline" 
+                      variant="outline"
                       className="gap-2 border-red-200 text-red-600 hover:bg-red-50"
                     >
                       <AlertTriangle className="h-4 w-4" />
@@ -180,7 +180,7 @@ export function FPLForm({ onVisualize, onLoad, routeData }: FPLFormProps) {
                             </motion.div>
                           ))}
                           {routeData.properties.fpl_string && (
-                            <motion.div 
+                            <motion.div
                               className="mt-6 pt-4 border-t"
                               initial={{ opacity: 0, y: 20 }}
                               animate={{ opacity: 1, y: 0 }}
@@ -206,8 +206,8 @@ export function FPLForm({ onVisualize, onLoad, routeData }: FPLFormProps) {
         ) : (
           <div>
             <h3 className="text-lg font-semibold mb-2">Choose Flight Template</h3>
-            <Select 
-              value={selectedTemplate} 
+            <Select
+              value={selectedTemplate}
               onValueChange={handleTemplateSelect}
               disabled={isSubmitting}
             >
@@ -231,8 +231,8 @@ export function FPLForm({ onVisualize, onLoad, routeData }: FPLFormProps) {
               disabled={isSubmitting}
             />
             <div className="flex gap-2">
-              <Button 
-                onClick={submitFPL} 
+              <Button
+                onClick={submitFPL}
                 className="flex-1 bg-blue-600 hover:bg-blue-700"
                 disabled={isSubmitting}
               >
@@ -241,9 +241,9 @@ export function FPLForm({ onVisualize, onLoad, routeData }: FPLFormProps) {
               {routeData?.properties?.risk_factors && (
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button 
+                    <Button
                       id="viewRisksButton"
-                      variant="outline" 
+                      variant="outline"
                       className="gap-2 border-red-200 text-red-600 hover:bg-red-50"
                     >
                       <AlertTriangle className="h-4 w-4" />
@@ -270,7 +270,7 @@ export function FPLForm({ onVisualize, onLoad, routeData }: FPLFormProps) {
                             </motion.div>
                           ))}
                           {routeData.properties.fpl_string && (
-                            <motion.div 
+                            <motion.div
                               className="mt-6 pt-4 border-t"
                               initial={{ opacity: 0, y: 20 }}
                               animate={{ opacity: 1, y: 0 }}
