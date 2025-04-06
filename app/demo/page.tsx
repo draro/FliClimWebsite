@@ -22,6 +22,12 @@ import { Label } from '@/components/ui/label';
 import emailjs from '@emailjs/browser';
 import { useToast } from "@/hooks/use-toast";
 
+declare global {
+  interface Window {
+    hbspt: any;
+  }
+}
+
 const CesiumViewer = dynamic(
   () => import('@/components/CesiumViewer').then(mod => mod.default),
   {
@@ -151,6 +157,7 @@ export default function DemoPage() {
       setIsSubmitting(true);
 
       try {
+        // Send email via EmailJS
         await emailjs.send(
           'service_c2sgsml',
           'template_oboeia9',
@@ -164,6 +171,24 @@ export default function DemoPage() {
           },
           'M6qeI5v5CtMA9WGRb'
         );
+
+        // Submit to HubSpot
+        if (window.hbspt) {
+          const hubspotData = {
+            fields: [
+              { name: "firstname", value: formData.firstName },
+              { name: "lastname", value: formData.lastName },
+              { name: "email", value: formData.email },
+              { name: "company", value: formData.company }
+            ],
+            context: {
+              pageUri: window.location.href,
+              pageName: "Demo Request"
+            }
+          };
+
+          window.hbspt.forms.submit("demo-form", hubspotData);
+        }
 
         toast({
           title: "Success!",
@@ -201,7 +226,7 @@ export default function DemoPage() {
                   This is a proof-of-concept demonstration of FlyClim's storm tracking and flight route optimization capabilities.
                 </p>
 
-                <form className="space-y-4">
+                <form id="demo-form" className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="firstName">First Name</Label>
