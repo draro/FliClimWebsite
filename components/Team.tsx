@@ -36,7 +36,7 @@ export function Team() {
                         Leadership
                     </h1>
                     <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                        Meet the visionary behind FlyClim's mission to revolutionize aviation weather optimization.
+                        Meet the visionary behind FlyClim&apos;s mission to revolutionize aviation weather optimization.
                     </p>
                 </motion.div>
 
@@ -95,15 +95,7 @@ export function Team() {
                                             <Linkedin className="h-6 w-6" />
                                         </Link>
                                     )}
-                                    {/* {ceo.social.twitter && (
-                                        <Link
-                                            href={ceo.social.twitter}
-                                            target="_blank"
-                                            className="text-gray-600 hover:text-blue-400 transition-colors"
-                                        >
-                                            <Twitter className="h-6 w-6" />
-                                        </Link>
-                                    )} */}
+
                                 </div>
                             </div>
                         </div>
@@ -120,7 +112,7 @@ export function Team() {
                         Join Our Mission
                     </h2>
                     <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
-                        We're looking for passionate individuals who share our vision of revolutionizing aviation through innovative weather optimization technology.
+                        We&apos;re looking for passionate individuals who share our vision of revolutionizing aviation through innovative weather optimization technology.
                     </p>
                     <Link
                         href="/contact"

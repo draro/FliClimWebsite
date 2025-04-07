@@ -223,7 +223,7 @@ export default function DemoPage() {
             <DialogDescription>
               <div className="space-y-6">
                 <p className="text-base">
-                  This is a proof-of-concept demonstration of FlyClim's storm tracking and flight route optimization capabilities.
+                  This is a proof-of-concept demonstration of FlyClim&apos;s storm tracking and flight route optimization capabilities.
                 </p>
 
                 <form id="demo-form" className="space-y-4">

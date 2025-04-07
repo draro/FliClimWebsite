@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface LoadingSpinnerProps {
@@ -18,7 +18,7 @@ export function LoadingSpinner({ isVisible }: LoadingSpinnerProps) {
   const reconnectTimeoutRef = useRef<NodeJS.Timeout>();
   const isVisibleRef = useRef(isVisible);
 
-  const connectWebSocket = () => {
+  const connectWebSocket = useCallback(() => {
     if (wsRef.current?.readyState === WebSocket.OPEN) return;
 
     const ws = new WebSocket('wss://demo.flyclim.com/ws/status');
@@ -55,7 +55,7 @@ export function LoadingSpinner({ isVisible }: LoadingSpinnerProps) {
         setWsMessages(prev => [...prev, '❌ Connection error']);
       }
     };
-  };
+  }, []);
 
   useEffect(() => {
     isVisibleRef.current = isVisible;
@@ -73,7 +73,7 @@ export function LoadingSpinner({ isVisible }: LoadingSpinnerProps) {
         clearTimeout(reconnectTimeoutRef.current);
       }
     }
-  }, [isVisible]);
+  }, [isVisible, connectWebSocket]);
 
   useEffect(() => {
     // Set up ping interval when component mounts

@@ -43,15 +43,15 @@ export function Contact() {
       });
       return;
     }
-    
+
     setIsSubmitting(true);
-    
+
     const subjectLabel = subjects.find(s => s.value === formData.subject)?.label || 'Contact Form Submission';
-    
+
     try {
       await emailjs.send(
-        'service_c2sgsml', // Replace with your EmailJS service ID
-        'template_oboeia9', // Replace with your EmailJS template ID
+        'service_c2sgsml',
+        'template_oboeia9',
         {
           from_name: formData.name,
           from_email: formData.email,
@@ -61,7 +61,7 @@ export function Contact() {
           accept_marketing: formData.acceptMarketing ? 'Yes' : 'No',
           to_email: 'davide@flyclim.com'
         },
-        'M6qeI5v5CtMA9WGRb' // Replace with your EmailJS public key
+        'M6qeI5v5CtMA9WGRb'
       );
 
       toast({
@@ -115,12 +115,12 @@ export function Contact() {
           className="text-center mb-16"
         >
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Let's Talk About Smarter Aviation
+            Let&apos;s Talk About Smarter Aviation
           </h2>
           <p className="text-xl text-gray-600">
             Have questions? Interested in our pilot program? Looking for partnership opportunities?
             <br />
-            Reach out—we'd love to hear from you.
+            Reach out—we&apos;d love to hear from you.
           </p>
         </motion.div>
 
@@ -136,36 +136,36 @@ export function Contact() {
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
                   Name
                 </label>
-                <Input 
-                  id="name" 
+                <Input
+                  id="name"
                   value={formData.name}
                   onChange={handleChange}
-                  required 
+                  required
                 />
               </div>
-              
+
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                   Email
                 </label>
-                <Input 
-                  type="email" 
-                  id="email" 
+                <Input
+                  type="email"
+                  id="email"
                   value={formData.email}
                   onChange={handleChange}
-                  required 
+                  required
                 />
               </div>
-              
+
               <div>
                 <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-2">
                   Airline / Company
                 </label>
-                <Input 
-                  id="company" 
+                <Input
+                  id="company"
                   value={formData.company}
                   onChange={handleChange}
-                  required 
+                  required
                 />
               </div>
 
@@ -173,8 +173,8 @@ export function Contact() {
                 <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
                   Subject
                 </label>
-                <Select 
-                  value={formData.subject} 
+                <Select
+                  value={formData.subject}
                   onValueChange={handleSubjectChange}
                   required
                 >
@@ -190,17 +190,17 @@ export function Contact() {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div>
                 <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
                   Message
                 </label>
-                <Textarea 
-                  id="message" 
-                  rows={4} 
+                <Textarea
+                  id="message"
+                  rows={4}
                   value={formData.message}
                   onChange={handleChange}
-                  required 
+                  required
                 />
               </div>
 
@@ -244,9 +244,9 @@ export function Contact() {
                   </div>
                 </div>
               </div>
-              
-              <Button 
-                type="submit" 
+
+              <Button
+                type="submit"
                 className="w-full group relative overflow-hidden"
                 disabled={isSubmitting}
               >

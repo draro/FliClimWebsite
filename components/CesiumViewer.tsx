@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { FPLForm } from '@/components/FPLForm';
 import { WebSocketStatus } from '@/components/WebSocketStatus';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 declare global {
   interface Window {
@@ -25,6 +25,7 @@ interface RouteResponse {
     fpl_string: string;
   };
 }
+
 type Coordinate = [number, number];
 
 interface SafePoint {
@@ -33,6 +34,7 @@ interface SafePoint {
   style: Record<string, any>;
   properties: Record<string, any>;
 }
+
 export default function CesiumViewer() {
   const viewerRef = useRef<any>(null);
   const stormCache = useRef<Record<string, any>>({});
@@ -132,7 +134,7 @@ export default function CesiumViewer() {
     }
   };
 
-  const updateStormLayer = async (currentTime: Date) => {
+  const updateStormLayer = useCallback(async (currentTime: Date) => {
     const bucket = roundTo5Minutes(currentTime);
     if (bucket === lastTimeBucket.current) return;
     lastTimeBucket.current = bucket;
@@ -180,10 +182,10 @@ export default function CesiumViewer() {
         }
 
         // Create top and bottom polygons
-        const positions = (coordinates as [number, number][]).map(([lon, lat]: any) =>
+        const positions = coordinates.map(([lon, lat]: Coordinate) =>
           window.Cesium.Cartesian3.fromDegrees(lon, lat, topHeight)
         );
-        const bottomPositions = coordinates.map(([lon, lat]: any) =>
+        const bottomPositions = coordinates.map(([lon, lat]: Coordinate) =>
           window.Cesium.Cartesian3.fromDegrees(lon, lat, baseHeight)
         );
 
@@ -212,7 +214,7 @@ export default function CesiumViewer() {
         currentStormLayer.current.push(bottomPolygon);
       }
     }
-  };
+  }, []);
 
   const parseFPLTime = (fpl: string): Date | null => {
     try {
@@ -297,6 +299,7 @@ export default function CesiumViewer() {
   };
 
   const visualizeRoute = async (data: RouteResponse, fpl: string) => {
+
     try {
       if (!data || data.type !== 'FeatureCollection' || !data.features.length) {
         alert('⚠️ Invalid GeoJSON route received.');
@@ -426,7 +429,7 @@ export default function CesiumViewer() {
       const now = window.Cesium.JulianDate.toDate(viewerRef.current.clock.currentTime);
       updateStormLayer(now);
     });
-  }, []);
+  }, [updateStormLayer]);
 
   return (
     <div className="relative w-full h-screen">
