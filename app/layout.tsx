@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import Script from 'next/script';
 import { CookieBanner } from '@/components/CookieBanner';
+import { NextAuthProvider } from '@/components/NextAuthProvider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -127,13 +128,15 @@ export default function RootLayout({
         {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe
-            src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX"
+            src="https://www.googletagmanager.com/ns.html?id=G-4ZBEPGDW9Z"
             height="0"
             width="0"
             style={{ display: 'none', visibility: 'hidden' }}
           />
         </noscript>
-        {children}
+        <NextAuthProvider>
+          {children}
+        </NextAuthProvider>
         <CookieBanner />
       </body>
     </html>

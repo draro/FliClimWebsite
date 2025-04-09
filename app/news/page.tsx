@@ -1,19 +1,19 @@
 import type { Metadata } from 'next';
 import { Navigation } from '@/components/Navigation';
-import { Team } from '@/components/Team';
+import { BlogList } from '@/components/BlogList';
 import { Footer } from '@/components/Footer';
 
 export const metadata: Metadata = {
-  title: 'Our Team',
-  description: 'Meet the experienced aviation and technology professionals behind FlyClim.',
+  title: 'News',
+  description: 'Latest news and announcements from FlyClim.',
 };
 
-export default function TeamPage() {
+export default function NewsPage() {
   return (
     <main className="min-h-screen">
       <Navigation />
       <div className="pt-16">
-        <Team />
+        <BlogList type="news" />
       </div>
       <Footer />
     </main>

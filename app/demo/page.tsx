@@ -63,7 +63,7 @@ export default function DemoPage() {
 
   const validateForm = () => {
     const errors: Record<string, string> = {};
-
+    
     if (!formData.firstName.trim()) errors.firstName = 'First name is required';
     if (!formData.lastName.trim()) errors.lastName = 'Last name is required';
     if (!formData.email.trim()) {
@@ -155,7 +155,7 @@ export default function DemoPage() {
   const handleSubmit = async () => {
     if (validateForm()) {
       setIsSubmitting(true);
-
+      
       try {
         // Send email via EmailJS
         await emailjs.send(
@@ -186,7 +186,7 @@ export default function DemoPage() {
               pageName: "Demo Request"
             }
           };
-
+          
           window.hbspt.forms.submit("demo-form", hubspotData);
         }
 
@@ -323,8 +323,8 @@ export default function DemoPage() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button
-              onClick={handleSubmit}
+            <Button 
+              onClick={handleSubmit} 
               className="w-full"
               disabled={isSubmitting}
             >
@@ -334,7 +334,7 @@ export default function DemoPage() {
         </DialogContent>
       </Dialog>
 
-      <motion.div
+      <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
@@ -349,7 +349,7 @@ export default function DemoPage() {
           <HelpCircle className="h-4 w-4" />
         </Button>
         <Link href="/" passHref>
-          <Button
+          <Button 
             variant="outline"
             className="bg-white/95 hover:bg-white border-blue-100 hover:border-blue-200 shadow-lg backdrop-blur-sm flex items-center gap-2 transition-all duration-300 hover:scale-105"
           >
@@ -358,7 +358,7 @@ export default function DemoPage() {
           </Button>
         </Link>
         <Link href="/" passHref>
-          <Button
+          <Button 
             size="icon"
             variant="outline"
             className="bg-white/95 hover:bg-white border-blue-100 hover:border-blue-200 shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-105"

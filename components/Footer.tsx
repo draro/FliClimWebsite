@@ -9,7 +9,7 @@ export function Footer() {
               AI-Powered Weather Optimization for Smarter Aviation Operations
             </p>
           </div>
-
+          
           <div>
             <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2">
@@ -19,16 +19,15 @@ export function Footer() {
               <li><a href="#contact" className="text-gray-400 hover:text-white">Contact</a></li>
             </ul>
           </div>
-
+          
           <div>
             <h4 className="text-lg font-semibold mb-4">Contact</h4>
             <ul className="space-y-2 text-gray-400">
-              <li>Email: <a href="mailto:info@flyclim.com">info@flyclim.com</a></li>
-              <li>Tel: <a href="tel:+19894472494">+1 (989) 447-2494</a></li>
-              <li>Tel: <a href="tel:+972538344355">+972 053-834-4355</a></li>
+              <li>Email: info@flyclim.com</li>
+              <li>Tel: +1 (555) 123-4567</li>
             </ul>
           </div>
-
+          
           <div>
             <h4 className="text-lg font-semibold mb-4">Legal</h4>
             <ul className="space-y-2">
@@ -37,7 +36,7 @@ export function Footer() {
             </ul>
           </div>
         </div>
-
+        
         <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
           <p>© {new Date().getFullYear()} FlyClim. All rights reserved.</p>
         </div>
