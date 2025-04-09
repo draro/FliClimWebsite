@@ -11,10 +11,10 @@ module.exports = {
         NEXTAUTH_URL: "https://www.flyclim.com",
         NEXTAUTH_SECRET: "drc2023",
         OPENAI_API_KEY: "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",
-        LINKEDIN_CLIENT_ID: "783bjofvrpul70",
-        LINKEDIN_ACCESS_TOKEN: "WPL_AP1.1gCvwcGjNKiBGtCA.Df38Mw==",
+        LINKEDIN_CLIENT_ID: "78llc9qkg3ol4k",
+        LINKEDIN_ACCESS_TOKEN: "WPL_AP1.5K51FwdZtbkaj3c7.U7kmxQ==",
         LINKEDIN_ORGANIZATION_ID: "https://www.linkedin.com/company/flyclim/",
-        LINKEDIN_REDIRECT_URI: "https://www.flyclim.com/api/auth/callback/linkedin"
+        LINKEDIN_REDIRECT_URI: "https://www.flyclim.com/api/linkedin/callback"
       }
     }
   ]

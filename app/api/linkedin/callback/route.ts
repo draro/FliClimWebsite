@@ -2,9 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { MongoClient } from 'mongodb';
 
-if (!process.env.LINKEDIN_CLIENT_ID || !process.env.LINKEDIN_CLIENT_SECRET) {
-    throw new Error('Missing LinkedIn credentials');
-}
 
 export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
@@ -13,6 +10,9 @@ export async function GET(request: NextRequest) {
     const error = searchParams.get('error');
     const cookieStore = cookies();
     const savedState = cookieStore.get('linkedin_state')?.value;
+    if (!process.env.LINKEDIN_CLIENT_ID || !process.env.LINKEDIN_CLIENT_SECRET) {
+        throw new Error('Missing LinkedIn credentials');
+    }
 
     // Handle errors from LinkedIn
     if (error) {

@@ -14,10 +14,10 @@ export async function GET(request: NextRequest) {
     if (!session) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    
+
     // Generate random state
     const state = crypto.randomBytes(16).toString('hex');
-    
+    console.log('Generated state:', state);
     // Store state in cookie for validation
     cookies().set('linkedin_state', state, {
         httpOnly: true,
@@ -25,14 +25,15 @@ export async function GET(request: NextRequest) {
         sameSite: 'lax',
         maxAge: 3600 // 1 hour
     });
-    
+
     // Construct LinkedIn OAuth URL
     const linkedinAuthUrl = new URL('https://www.linkedin.com/oauth/v2/authorization');
     linkedinAuthUrl.searchParams.append('response_type', 'code');
-    linkedinAuthUrl.searchParams.append('client_id', process.env.LINKEDIN_CLIENT_ID);
+    linkedinAuthUrl.searchParams.append('client_id', process.env.LINKEDIN_CLIENT_ID || '');
     linkedinAuthUrl.searchParams.append('redirect_uri', `${process.env.NEXTAUTH_URL}/api/linkedin/callback`);
     linkedinAuthUrl.searchParams.append('state', state);
-    linkedinAuthUrl.searchParams.append('scope', 'w_member_social w_organization_social r_organization_social');
-    
+    linkedinAuthUrl.searchParams.append('scope', 'w_member_social openid profile email'); // Adjust scopes as needed
+    console.log('LinkedIn Auth URL:', linkedinAuthUrl.toString());
+
     return NextResponse.redirect(linkedinAuthUrl);
 }

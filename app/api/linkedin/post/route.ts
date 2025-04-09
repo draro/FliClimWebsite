@@ -24,7 +24,7 @@ const getLinkedInAccessToken = async () => {
     console.log('🕒 Expires In:', response.data.expires_in);
 
     return response.data.access_token;
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Failed to get LinkedIn token:', error.response?.data || error.message);
   }
 };
