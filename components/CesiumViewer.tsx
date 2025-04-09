@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { useEffect, useRef, useState, useCallback } from 'react';
 import { FPLForm } from '@/components/FPLForm';
 import { WebSocketStatus } from '@/components/WebSocketStatus';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
