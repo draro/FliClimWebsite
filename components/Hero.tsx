@@ -10,9 +10,9 @@ export function Hero() {
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&q=80')] bg-cover bg-center opacity-10" />
       </div>
-
+      
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 text-center">
-        <motion.h1
+        <motion.h1 
           className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-6"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -22,8 +22,8 @@ export function Hero() {
           <br />
           <span className="text-blue-600">Before They Happen</span>
         </motion.h1>
-
-        <motion.div
+        
+        <motion.div 
           className="mt-4 space-y-6"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -33,11 +33,11 @@ export function Hero() {
             AI-Powered Weather Optimization for Smarter Aviation Operations
           </p>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            FlyClim helps airlines proactively detect and avoid weather-related disruptions using real-time data and predictive routing intelligence. Save time, reduce fuel burn, lower operational costs—and transform how you fly.
+            Join the future of aviation. FlyClim helps airlines reduce costly weather-related delays with predictive routing intelligence—saving time, fuel, and operational costs.
           </p>
         </motion.div>
-
-        <motion.div
+        
+        <motion.div 
           className="mt-10 flex flex-col sm:flex-row gap-4 justify-center"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

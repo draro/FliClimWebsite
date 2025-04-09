@@ -50,8 +50,8 @@ export function Contact() {
     
     try {
       await emailjs.send(
-        'service_c2sgsml', // Replace with your EmailJS service ID
-        'template_oboeia9', // Replace with your EmailJS template ID
+        'service_c2sgsml',
+        'template_oboeia9',
         {
           from_name: formData.name,
           from_email: formData.email,
@@ -61,7 +61,7 @@ export function Contact() {
           accept_marketing: formData.acceptMarketing ? 'Yes' : 'No',
           to_email: 'davide@flyclim.com'
         },
-        'M6qeI5v5CtMA9WGRb' // Replace with your EmailJS public key
+        'M6qeI5v5CtMA9WGRb'
       );
 
       toast({
@@ -115,12 +115,12 @@ export function Contact() {
           className="text-center mb-16"
         >
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Let's Talk About Smarter Aviation
+            Let&apos;s Talk About Smarter Aviation
           </h2>
           <p className="text-xl text-gray-600">
             Have questions? Interested in our pilot program? Looking for partnership opportunities?
             <br />
-            Reach out—we'd love to hear from you.
+            Reach out—we&apos;d love to hear from you.
           </p>
         </motion.div>
 

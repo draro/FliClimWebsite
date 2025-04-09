@@ -1,11 +1,18 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { FPLForm } from '@/components/FPLForm';
 import { WebSocketStatus } from '@/components/WebSocketStatus';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 
 declare global {
   interface Window {
@@ -25,6 +32,42 @@ interface RouteResponse {
     fpl_string: string;
   };
 }
+
+interface AirportRisk {
+  icao: string;
+  airport: {
+    lat: number;
+    lon: number;
+    elevation: number;
+  };
+  metar: {
+    raw: string;
+    wind: {
+      wind_direction: string;
+      wind_speed: string;
+      uom: string;
+    };
+    visibility: {
+      uom: string;
+      distance: string;
+    };
+    trend: string;
+  };
+  risk: {
+    wind_risk: number;
+    temp_risk: number;
+    pressure_risk: number;
+    humidity_risk: number;
+    visibility_risk: number;
+    total_risk: number;
+    risk_classification: string;
+  };
+  flight_delay: {
+    delay_probability: string;
+    delay_risk: string;
+  };
+}
+
 type Coordinate = [number, number];
 
 interface SafePoint {
@@ -33,6 +76,7 @@ interface SafePoint {
   style: Record<string, any>;
   properties: Record<string, any>;
 }
+
 export default function CesiumViewer() {
   const viewerRef = useRef<any>(null);
   const stormCache = useRef<Record<string, any>>({});
@@ -41,6 +85,9 @@ export default function CesiumViewer() {
   const [isLoading, setIsLoading] = useState(false);
   const [showFPL, setShowFPL] = useState(true);
   const [routeData, setRouteData] = useState<RouteResponse | null>(null);
+  const [showAirportRisk, setShowAirportRisk] = useState(false);
+  const [selectedAirport, setSelectedAirport] = useState<AirportRisk | null>(null);
+  const [isLoadingAirport, setIsLoadingAirport] = useState(false);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -75,6 +122,21 @@ export default function CesiumViewer() {
       }
     };
   }, []);
+
+  const fetchAirportRisk = async (icao: string) => {
+    try {
+      setIsLoadingAirport(true);
+      const response = await fetch(`https://amss.xtreme-weather.com/api/airport_risk/${icao}`);
+      if (!response.ok) throw new Error('Failed to fetch airport risk data');
+      const data = await response.json();
+      setSelectedAirport(data);
+      setShowAirportRisk(true);
+    } catch (error) {
+      console.error('Error fetching airport risk:', error);
+    } finally {
+      setIsLoadingAirport(false);
+    }
+  };
 
   const safeFromDegrees = (lon: number, lat: number, alt = 0) => {
     if (typeof lon !== 'number' || typeof lat !== 'number' || isNaN(lon) || isNaN(lat)) {
@@ -132,7 +194,7 @@ export default function CesiumViewer() {
     }
   };
 
-  const updateStormLayer = async (currentTime: Date) => {
+  const updateStormLayer = useCallback(async (currentTime: Date) => {
     const bucket = roundTo5Minutes(currentTime);
     if (bucket === lastTimeBucket.current) return;
     lastTimeBucket.current = bucket;
@@ -140,7 +202,6 @@ export default function CesiumViewer() {
     const geojson = await fetchStormGeoJSON(bucket);
     if (!geojson) return;
 
-    // Remove previous storm entities
     if (currentStormLayer.current.length > 0) {
       currentStormLayer.current.forEach(entity => {
         viewerRef.current.entities.remove(entity);
@@ -148,19 +209,16 @@ export default function CesiumViewer() {
       currentStormLayer.current = [];
     }
 
-    // Process each storm feature and create 3D volumes
     for (const feature of geojson.features) {
       if (feature.geometry.type === 'Polygon') {
         const coordinates = feature.geometry.coordinates[0] as Coordinate[];
-        const baseHeight = 600; // Base height in meters
-        const topHeight = Math.random() * (12000 - 9500) + 9500; // Random height between 9500 and 12000 meters
+        const baseHeight = 600;
+        const topHeight = Math.random() * (12000 - 9500) + 9500;
 
-        // Create the walls of the storm
         for (let i = 0; i < coordinates.length - 1; i++) {
           const [lon1, lat1] = coordinates[i];
           const [lon2, lat2] = coordinates[i + 1];
 
-          // Create a wall between two points
           const wall = viewerRef.current.entities.add({
             wall: {
               positions: window.Cesium.Cartesian3.fromDegreesArrayHeights([
@@ -179,15 +237,13 @@ export default function CesiumViewer() {
           currentStormLayer.current.push(wall);
         }
 
-        // Create top and bottom polygons
-        const positions = (coordinates as [number, number][]).map(([lon, lat]: any) =>
+        const positions = coordinates.map(([lon, lat]: Coordinate) =>
           window.Cesium.Cartesian3.fromDegrees(lon, lat, topHeight)
         );
-        const bottomPositions = coordinates.map(([lon, lat]: any) =>
+        const bottomPositions = coordinates.map(([lon, lat]: Coordinate) =>
           window.Cesium.Cartesian3.fromDegrees(lon, lat, baseHeight)
         );
 
-        // Add top polygon
         const topPolygon = viewerRef.current.entities.add({
           polygon: {
             hierarchy: new window.Cesium.PolygonHierarchy(positions),
@@ -199,7 +255,6 @@ export default function CesiumViewer() {
         });
         currentStormLayer.current.push(topPolygon);
 
-        // Add bottom polygon
         const bottomPolygon = viewerRef.current.entities.add({
           polygon: {
             hierarchy: new window.Cesium.PolygonHierarchy(bottomPositions),
@@ -212,7 +267,7 @@ export default function CesiumViewer() {
         currentStormLayer.current.push(bottomPolygon);
       }
     }
-  };
+  }, []);
 
   const parseFPLTime = (fpl: string): Date | null => {
     try {
@@ -303,7 +358,6 @@ export default function CesiumViewer() {
         return;
       }
 
-      // Store the entire response including properties for risk assessment
       setRouteData(data);
       clearStormCache();
 
@@ -325,6 +379,52 @@ export default function CesiumViewer() {
         .filter((p): p is SafePoint => p.time !== null)
         .sort((a, b) => a.time.getTime() - b.time.getTime());
 
+      // Extract ADEP and ADES from FPL
+      const adepMatch = fpl.match(/-([A-Z]{4})\d{4}/);
+      const adesMatch = fpl.match(/-([A-Z]{4})\d{4}$/);
+
+      if (adepMatch && adesMatch) {
+        const adep = adepMatch[1];
+        const ades = adesMatch[1];
+
+        // Create clickable entities for airports
+        safePoints.forEach((point, index) => {
+          if (index === 0 || index === safePoints.length - 1) {
+            const icao = index === 0 ? adep : ades;
+            const position = safeFromDegrees(point.coordinates[0], point.coordinates[1], 0);
+            if (position) {
+              viewer.entities.add({
+                position,
+                billboard: {
+                  image: '/airport-icon.png',
+                  verticalOrigin: window.Cesium.VerticalOrigin.BOTTOM,
+                  scale: 0.5
+                },
+                label: {
+                  text: icao,
+                  font: '14px sans-serif',
+                  style: window.Cesium.LabelStyle.FILL_AND_OUTLINE,
+                  outlineWidth: 2,
+                  verticalOrigin: window.Cesium.VerticalOrigin.BOTTOM,
+                  pixelOffset: new window.Cesium.Cartesian2(0, -40)
+                }
+              });
+
+              // Add click handler
+              viewer.screenSpaceEventHandler.setInputAction(async (click: any) => {
+                const pickedObject = viewer.scene.pick(click.position);
+                if (window.Cesium.defined(pickedObject)) {
+                  const entity = pickedObject.id;
+                  if (entity.label && entity.label.text._value === icao) {
+                    await fetchAirportRisk(icao);
+                  }
+                }
+              }, window.Cesium.ScreenSpaceEventType.LEFT_CLICK);
+            }
+          }
+        });
+      }
+
       const property = new window.Cesium.SampledPositionProperty();
 
       safePoints.forEach((point, index) => {
@@ -332,7 +432,9 @@ export default function CesiumViewer() {
         const position = safeFromDegrees(lon, lat, 10600);
 
         if (position) {
-          createBillboard(position, point.style, point.properties);
+          if (index !== 0 && index !== safePoints.length - 1) {
+            createBillboard(position, point.style, point.properties);
+          }
           const julianDate = window.Cesium.JulianDate.fromDate(point.time);
           property.addSample(julianDate, position);
         }
@@ -426,7 +528,7 @@ export default function CesiumViewer() {
       const now = window.Cesium.JulianDate.toDate(viewerRef.current.clock.currentTime);
       updateStormLayer(now);
     });
-  }, []);
+  }, [updateStormLayer]);
 
   return (
     <div className="relative w-full h-screen">
@@ -443,7 +545,54 @@ export default function CesiumViewer() {
         </Button>
       </div>
       <WebSocketStatus />
-      <LoadingSpinner isVisible={isLoading} />
+      <LoadingSpinner isVisible={isLoading || isLoadingAirport} />
+
+      <Sheet open={showAirportRisk} onOpenChange={setShowAirportRisk}>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>Airport Risk Assessment - {selectedAirport?.icao}</SheetTitle>
+            <SheetDescription>
+              {selectedAirport && (
+                <div className="space-y-4 pt-4">
+                  <div className="bg-blue-50 p-4 rounded-lg">
+                    <h3 className="font-semibold mb-2">Current Weather (METAR)</h3>
+                    <p className="font-mono text-sm">{selectedAirport.metar.raw}</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <h3 className="font-semibold">Risk Assessment</h3>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="bg-gray-50 p-3 rounded">
+                        <p className="text-sm text-gray-600">Wind Risk</p>
+                        <p className="font-semibold">{selectedAirport.risk.wind_risk}%</p>
+                      </div>
+                      <div className="bg-gray-50 p-3 rounded">
+                        <p className="text-sm text-gray-600">Visibility Risk</p>
+                        <p className="font-semibold">{selectedAirport.risk.visibility_risk}%</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className={`p-4 rounded-lg ${selectedAirport.risk.risk_classification === 'high' ? 'bg-red-50 text-red-700' :
+                    selectedAirport.risk.risk_classification === 'medium' ? 'bg-yellow-50 text-yellow-700' :
+                      'bg-green-50 text-green-700'
+                    }`}>
+                    <h3 className="font-semibold capitalize mb-2">
+                      {selectedAirport.risk.risk_classification} Risk Level
+                    </h3>
+                    <p className="text-sm">
+                      Total Risk Score: {selectedAirport.risk.total_risk}%
+                    </p>
+                    <p className="text-sm mt-2">
+                      Delay Probability: {selectedAirport.flight_delay.delay_probability}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </SheetDescription>
+          </SheetHeader>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }

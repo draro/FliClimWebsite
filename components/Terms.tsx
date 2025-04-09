@@ -25,9 +25,9 @@ export function Terms() {
 
             <h2 className="text-2xl font-semibold mb-4">2. Definitions</h2>
             <ul className="list-disc pl-6 mb-6">
-              <li className="mb-2">"Service" refers to FlyClim's weather optimization and flight planning platform</li>
-              <li className="mb-2">"User" refers to any individual or entity accessing or using the Service</li>
-              <li className="mb-2">"Content" refers to all information and data provided through the Service</li>
+              <li className="mb-2">&quot;Service&quot; refers to FlyClim&apos;s weather optimization and flight planning platform</li>
+              <li className="mb-2">&quot;User&quot; refers to any individual or entity accessing or using the Service</li>
+              <li className="mb-2">&quot;Content&quot; refers to all information and data provided through the Service</li>
             </ul>
 
             <h2 className="text-2xl font-semibold mb-4">3. Use License</h2>
@@ -48,7 +48,7 @@ export function Terms() {
 
             <h2 className="text-2xl font-semibold mb-4">5. Disclaimer</h2>
             <p className="mb-6">
-              The Service is provided "as is". FlyClim makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties.
+              The Service is provided &quot;as is&quot;. FlyClim makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties.
             </p>
 
             <h2 className="text-2xl font-semibold mb-4">6. Limitations</h2>
