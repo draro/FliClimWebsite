@@ -1,87 +1,46 @@
-// import { NextRequest, NextResponse } from 'next/server';
-// import { getServerSession } from 'next-auth';
-// import { authOptions } from '../../auth/[...nextauth]/route';
-// import { cleanMarkdownForLinkedIn } from '@/utils/utils';
-
-// export async function POST(request: NextRequest) {
-//   const session = await getServerSession(authOptions);
-
-//   if (!session) {
-//     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-//   }
-
-//   const accessToken = process.env.LINKEDIN_ACCESS_TOKEN;
-//   const orgId = process.env.LINKEDIN_ORGANIZATION_ID;
-
-//   if (!accessToken || !orgId) {
-//     console.error('Missing LinkedIn access token or org ID');
-//     return NextResponse.json({ error: 'LinkedIn config missing' }, { status: 500 });
-//   }
-
-//   try {
-//     const { title, content, url } = await request.json();
-
-//     const cleanContent = cleanMarkdownForLinkedIn(content);
-//     const fullMessage = `${title}\n\n${cleanContent}\n\nRead more: ${url}`;
-
-//     const linkedInResponse = await fetch('https://api.linkedin.com/v2/ugcPosts', {
-//       method: 'POST',
-//       headers: {
-//         Authorization: `Bearer ${accessToken}`,
-//         'Content-Type': 'application/json',
-//         'X-Restli-Protocol-Version': '2.0.0',
-//       },
-//       body: JSON.stringify({
-//         author: `urn:li:organization:${orgId}`,
-//         lifecycleState: 'PUBLISHED',
-//         specificContent: {
-//           'com.linkedin.ugc.ShareContent': {
-//             shareCommentary: {
-//               text: fullMessage,
-//             },
-//             shareMediaCategory: 'NONE',
-//           },
-//         },
-//         visibility: {
-//           'com.linkedin.ugc.MemberNetworkVisibility': 'PUBLIC',
-//         },
-//       }),
-//     });
-
-//     if (!linkedInResponse.ok) {
-//       const err = await linkedInResponse.text();
-//       console.error('LinkedIn API Error:', err);
-//       return NextResponse.json({ error: 'Failed to post on LinkedIn' }, { status: 500 });
-//     }
-
-//     const data = await linkedInResponse.json();
-//     return NextResponse.json({ success: true, postId: data.id });
-//   } catch (error) {
-//     console.error('Post error:', error);
-//     return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
-//   }
-// }
-
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../auth/[...nextauth]/route';
 import { cleanMarkdownForLinkedIn } from '@/utils/utils';
+import axios from 'axios'
 
+
+const getLinkedInAccessToken = async () => {
+  const url = 'https://www.linkedin.com/oauth/v2/accessToken';
+  const payload = new URLSearchParams({
+    grant_type: 'authorization_code',
+    code: 'AUTHORIZATION_CODE_FROM_CALLBACK',
+    redirect_uri: 'https://flyclim.com/api/linkedin/callback',
+    client_id: process.env.LINKEDIN_CLIENT_ID || '',
+    client_secret: process.env.LINKEDIN_ACCESS_TOKEN || '',
+  });
+
+  try {
+    const response = await axios.post(url, payload.toString(), {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    });
+
+    console.log('✅ Access Token:', response.data.access_token);
+    console.log('🕒 Expires In:', response.data.expires_in);
+
+    return response.data.access_token;
+  } catch (error) {
+    console.error('❌ Failed to get LinkedIn token:', error.response?.data || error.message);
+  }
+};
 export async function POST(request: NextRequest) {
-  // Authenticate user session
   const session = await getServerSession(authOptions);
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  // Check LinkedIn env vars
-  const accessToken = process.env.LINKEDIN_ACCESS_TOKEN;
+  const accessToken = await getLinkedInAccessToken();
   const orgId = process.env.LINKEDIN_ORGANIZATION_ID;
 
   if (!accessToken || !orgId) {
-    console.error('Missing LinkedIn access token or organization ID');
+    console.error('Missing LinkedIn credentials');
     return NextResponse.json(
-      { error: 'LinkedIn access token or org ID missing' },
+      { error: 'LinkedIn access token or organization ID missing' },
       { status: 500 }
     );
   }
@@ -90,11 +49,25 @@ export async function POST(request: NextRequest) {
     const { title, content, url }: { title: string; content: string; url: string } =
       await request.json();
 
-    // Clean up markdown
     const cleanContent = cleanMarkdownForLinkedIn(content);
-    const fullMessage = `${title}\n\n${cleanContent}\n\nRead more: ${url}`;
+    const formattedMessage = `${title}\n\n${cleanContent}\n\nRead more: ${url}`;
 
-    // Send request to LinkedIn
+    const linkedInPayload = {
+      author: `urn:li:organization:${orgId}`,
+      lifecycleState: 'PUBLISHED',
+      specificContent: {
+        'com.linkedin.ugc.ShareContent': {
+          shareCommentary: {
+            text: formattedMessage,
+          },
+          shareMediaCategory: 'NONE', // Or "ARTICLE" if you add media
+        },
+      },
+      visibility: {
+        'com.linkedin.ugc.MemberNetworkVisibility': 'PUBLIC',
+      },
+    };
+
     const linkedInResponse = await fetch('https://api.linkedin.com/v2/ugcPosts', {
       method: 'POST',
       headers: {
@@ -102,38 +75,19 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/json',
         'X-Restli-Protocol-Version': '2.0.0',
       },
-      body: JSON.stringify({
-        author: `urn:li:organization:${orgId}`,
-        lifecycleState: 'PUBLISHED',
-        specificContent: {
-          'com.linkedin.ugc.ShareContent': {
-            shareCommentary: {
-              text: fullMessage,
-            },
-            shareMediaCategory: 'NONE',
-          },
-        },
-        visibility: {
-          'com.linkedin.ugc.MemberNetworkVisibility': 'PUBLIC',
-        },
-      }),
+      body: JSON.stringify(linkedInPayload),
     });
 
-    // Handle failure
     if (!linkedInResponse.ok) {
-      const errorResponse = await linkedInResponse.json();
-      console.error('LinkedIn API Error:', errorResponse);
-      return NextResponse.json(
-        { error: 'Failed to post to LinkedIn', detail: errorResponse },
-        { status: linkedInResponse.status }
-      );
+      const error = await linkedInResponse.json();
+      console.error('LinkedIn API Error:', error);
+      return NextResponse.json({ error: 'Failed to post to LinkedIn', detail: error }, { status: linkedInResponse.status });
     }
 
-    // Success
     const data = await linkedInResponse.json();
     return NextResponse.json({ success: true, postId: data.id });
   } catch (error) {
-    console.error('LinkedIn POST error:', error);
+    console.error('Unexpected error while posting to LinkedIn:', error);
     return NextResponse.json({ error: 'Unexpected error' }, { status: 500 });
   }
 }

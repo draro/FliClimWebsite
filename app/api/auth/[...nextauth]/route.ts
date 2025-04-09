@@ -43,7 +43,7 @@ export const authOptions: AuthOptions = {
             }),
           });
 
-          const user:any = await response.json();
+          const user: any = await response.json();
           console.log('User:', user);
           if (!user || !user.email) {
             return null;
