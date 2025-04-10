@@ -84,7 +84,7 @@ export function Settings() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       const response = await fetch('/api/settings', {
         method: 'POST',

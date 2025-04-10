@@ -30,6 +30,13 @@ interface RouteResponse {
     risk_level: string;
     risk_factors: string[];
     fpl_string: string;
+    original_route: {
+      type: string;
+      geometry: {
+        type: "LineString";
+        coordinates: number[][];
+      };
+    };
   };
 }
 
@@ -237,7 +244,6 @@ export default function CesiumViewer() {
           currentStormLayer.current.push(wall);
         }
 
-        // Create top and bottom polygons
         const positions = coordinates.map(([lon, lat]: Coordinate) =>
           window.Cesium.Cartesian3.fromDegrees(lon, lat, topHeight)
         );
@@ -353,7 +359,6 @@ export default function CesiumViewer() {
   };
 
   const visualizeRoute = async (data: RouteResponse, fpl: string) => {
-
     try {
       if (!data || data.type !== 'FeatureCollection' || !data.features.length) {
         alert('⚠️ Invalid GeoJSON route received.');
@@ -366,6 +371,23 @@ export default function CesiumViewer() {
       const viewer = viewerRef.current;
       viewer.dataSources.removeAll();
       viewer.entities.removeAll();
+
+      // Display original route if available
+      if (data.properties?.original_route?.geometry?.coordinates) {
+        const originalCoords = data.properties.original_route.geometry.coordinates;
+        const originalPositions = originalCoords
+          .map(([lon, lat]) => safeFromDegrees(lon, lat, 10600))
+          .filter(p => p);
+
+        viewer.entities.add({
+          polyline: {
+            positions: originalPositions,
+            width: 3,
+            material: window.Cesium.Color.ORANGE.withAlpha(0.6),
+            clampToGround: false
+          }
+        });
+      }
 
       const departureTime = parseFPLTime(fpl) || new Date();
       const startJulian = window.Cesium.JulianDate.fromDate(departureTime);
@@ -381,7 +403,6 @@ export default function CesiumViewer() {
         .filter((p): p is SafePoint => p.time !== null)
         .sort((a, b) => a.time.getTime() - b.time.getTime());
 
-      // Extract ADEP and ADES from FPL
       const adepMatch = fpl.match(/-([A-Z]{4})\d{4}/);
       const adesMatch = fpl.match(/-([A-Z]{4})\d{4}$/);
 
@@ -389,7 +410,6 @@ export default function CesiumViewer() {
         const adep = adepMatch[1];
         const ades = adesMatch[1];
 
-        // Create clickable entities for airports
         safePoints.forEach((point, index) => {
           if (index === 0 || index === safePoints.length - 1) {
             const icao = index === 0 ? adep : ades;
@@ -412,7 +432,6 @@ export default function CesiumViewer() {
                 }
               });
 
-              // Add click handler
               viewer.screenSpaceEventHandler.setInputAction(async (click: any) => {
                 const pickedObject = viewer.scene.pick(click.position);
                 if (window.Cesium.defined(pickedObject)) {
@@ -459,7 +478,7 @@ export default function CesiumViewer() {
         polyline: {
           positions,
           width: 3,
-          material: window.Cesium.Color.CYAN
+          material: window.Cesium.Color.CYAN.withAlpha(0.8)
         }
       });
 

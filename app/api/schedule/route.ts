@@ -67,6 +67,7 @@ export async function POST(request: NextRequest) {
         // Generate content with ChatGPT if requested
         let content = '';
         let title = body.title;
+        let featuredImage = body.featuredImage;
 
         if (body.generateContent) {
             const prompt = `Write a ${body.type} post about ${body.topic} for an aviation weather optimization company. 
@@ -78,15 +79,35 @@ export async function POST(request: NextRequest) {
                 model: "gpt-4",
             });
 
-            const generatedContent = completion.choices[0].message.content;
+            const generatedContent = completion.choices[0].message.content || "";
 
             // Extract title and content from generated markdown
-            const lines = (generatedContent ?? '').split('\n');
+            const lines = generatedContent.split('\n');
             if (lines[0].startsWith('# ')) {
                 title = lines[0].substring(2);
                 content = lines.slice(1).join('\n').trim();
             } else {
-                content = generatedContent ?? '';
+                content = generatedContent;
+            }
+
+            // Generate an image if none provided
+            if (!featuredImage) {
+                try {
+                    const imageResponse = await openai.images.generate({
+                        model: "dall-e-3",
+                        prompt: `Create a professional, high-quality image related to ${body.topic} in the context of aviation and weather technology. The image should be suitable for a business website or blog post.`,
+                        n: 1,
+                        size: "1024x1024",
+                        quality: "standard",
+                        style: "natural"
+                    });
+
+                    if (imageResponse.data[0]?.url) {
+                        featuredImage = imageResponse.data[0].url;
+                    }
+                } catch (imageError) {
+                    console.error('Failed to generate image:', imageError);
+                }
             }
         } else {
             content = body.content || '';
@@ -106,6 +127,7 @@ export async function POST(request: NextRequest) {
             status: body.publishNow ? 'published' : 'scheduled',
             scheduledFor: new Date(body.scheduledFor),
             shareToLinkedIn: body.shareToLinkedIn,
+            featuredImage,
             createdAt: new Date(),
             updatedAt: new Date(),
             publishedAt: body.publishNow ? new Date() : null
@@ -126,7 +148,7 @@ export async function POST(request: NextRequest) {
                     body: JSON.stringify({
                         title: postData.title,
                         content: postData.content.substring(0, 200),
-                        url: `https://flyclim.com/${postData.type}/${postData.slug}`
+                        url: `${process.env.NEXTAUTH_URL}/${postData.type}/${postData.slug}`
                     })
                 });
             }

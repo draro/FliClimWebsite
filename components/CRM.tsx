@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -15,9 +15,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { format } from 'date-fns';
-import { UserPlus, Mail, Phone } from 'lucide-react';
-import Link from 'next/link';
+import { UserPlus, Mail, Phone, Linkedin, MessageSquarePlus, Pencil } from 'lucide-react';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface Lead {
   _id: string;
@@ -25,8 +32,14 @@ interface Lead {
   email: string;
   company: string;
   phone?: string;
+  linkedinProfile?: string;
   status: 'new' | 'contacted' | 'qualified' | 'proposal' | 'won' | 'lost';
   source: 'website' | 'demo' | 'manual';
+  activities: Array<{
+    type: string;
+    note: string;
+    timestamp: string;
+  }>;
   createdAt: string;
 }
 
@@ -35,11 +48,16 @@ export function CRM() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showActivityDialog, setShowActivityDialog] = useState(false);
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [newNote, setNewNote] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     company: '',
     phone: '',
+    linkedinProfile: '',
     status: 'new',
     source: 'manual'
   });
@@ -70,16 +88,16 @@ export function CRM() {
 
     try {
       const response = await fetch('/api/leads', {
-        method: 'POST',
+        method: isEditing ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(isEditing ? { ...formData, _id: selectedLead?._id } : formData)
       });
 
-      if (!response.ok) throw new Error('Failed to create lead');
+      if (!response.ok) throw new Error(isEditing ? 'Failed to update lead' : 'Failed to create lead');
 
       toast({
         title: 'Success',
-        description: 'Lead created successfully'
+        description: isEditing ? 'Lead updated successfully' : 'Lead created successfully'
       });
 
       setFormData({
@@ -87,38 +105,139 @@ export function CRM() {
         email: '',
         company: '',
         phone: '',
+        linkedinProfile: '',
         status: 'new',
         source: 'manual'
       });
       setShowAddForm(false);
+      setIsEditing(false);
+      setSelectedLead(null);
       fetchLeads();
     } catch (error) {
-      console.error('Failed to create lead:', error);
+      console.error(isEditing ? 'Failed to update lead:' : 'Failed to create lead:', error);
       toast({
         title: 'Error',
-        description: 'Failed to create lead',
+        description: isEditing ? 'Failed to update lead' : 'Failed to create lead',
         variant: 'destructive'
       });
     }
   };
 
-  const getStatusColor = (status: string): "default" | "destructive" | "outline" | "secondary" | null | undefined => {
-    const colors: Record<string, "default" | "destructive" | "outline" | "secondary" | null | undefined> = {
-      new: 'default',
-      contacted: 'secondary',
-      qualified: 'outline',
-      proposal: 'outline',
-      won: 'default',
-      lost: 'destructive'
+  const handleEdit = (lead: Lead) => {
+    setSelectedLead(lead);
+    setFormData({
+      name: lead.name,
+      email: lead.email,
+      company: lead.company,
+      phone: lead.phone || '',
+      linkedinProfile: lead.linkedinProfile || '',
+      status: lead.status,
+      source: lead.source
+    });
+    setIsEditing(true);
+    setShowAddForm(true);
+  };
+
+  const handleStatusChange = async (leadId: string, newStatus: string) => {
+    try {
+      const response = await fetch('/api/leads', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          _id: leadId,
+          status: newStatus
+        })
+      });
+
+      if (!response.ok) throw new Error('Failed to update lead status');
+
+      toast({
+        title: 'Success',
+        description: 'Lead status updated successfully'
+      });
+
+      fetchLeads();
+    } catch (error) {
+      console.error('Failed to update lead status:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to update lead status',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleAddNote = async () => {
+    if (!selectedLead || !newNote.trim()) return;
+
+    try {
+      const response = await fetch('/api/leads', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          _id: selectedLead._id,
+          note: newNote
+        })
+      });
+
+      if (!response.ok) throw new Error('Failed to add note');
+
+      toast({
+        title: 'Success',
+        description: 'Note added successfully'
+      });
+
+      setNewNote('');
+      fetchLeads();
+    } catch (error) {
+      console.error('Failed to add note:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to add note',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    const colors: Record<string, string> = {
+      new: 'bg-blue-100 text-blue-800 border-blue-200',
+      contacted: 'bg-purple-100 text-purple-800 border-purple-200',
+      qualified: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+      proposal: 'bg-amber-100 text-amber-800 border-amber-200',
+      won: 'bg-green-100 text-green-800 border-green-200',
+      lost: 'bg-red-100 text-red-800 border-red-200'
     };
-    return colors[status] || 'default';
+    return colors[status] || 'bg-gray-100 text-gray-800 border-gray-200';
+  };
+
+  const getSourceColor = (source: string) => {
+    const colors: Record<string, string> = {
+      website: 'bg-indigo-100 text-indigo-800 border-indigo-200',
+      demo: 'bg-cyan-100 text-cyan-800 border-cyan-200',
+      manual: 'bg-slate-100 text-slate-800 border-slate-200'
+    };
+    return colors[source] || 'bg-gray-100 text-gray-800 border-gray-200';
   };
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Lead Management</h2>
-        <Button onClick={() => setShowAddForm(!showAddForm)}>
+        <Button onClick={() => {
+          setIsEditing(false);
+          setSelectedLead(null);
+          setFormData({
+            name: '',
+            email: '',
+            company: '',
+            phone: '',
+            linkedinProfile: '',
+            status: 'new',
+            source: 'manual'
+          });
+          setShowAddForm(!showAddForm);
+        }}>
           <UserPlus className="h-4 w-4 mr-2" />
           Add Lead
         </Button>
@@ -166,6 +285,15 @@ export function CRM() {
               </div>
             </div>
 
+            <div>
+              <label className="block text-sm font-medium mb-1">LinkedIn Profile</label>
+              <Input
+                value={formData.linkedinProfile}
+                onChange={e => setFormData(prev => ({ ...prev, linkedinProfile: e.target.value }))}
+                placeholder="https://linkedin.com/in/username"
+              />
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1">Status</label>
@@ -205,11 +333,15 @@ export function CRM() {
             </div>
 
             <div className="flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={() => setShowAddForm(false)}>
+              <Button type="button" variant="outline" onClick={() => {
+                setShowAddForm(false);
+                setIsEditing(false);
+                setSelectedLead(null);
+              }}>
                 Cancel
               </Button>
               <Button type="submit">
-                Add Lead
+                {isEditing ? 'Update Lead' : 'Add Lead'}
               </Button>
             </div>
           </form>
@@ -246,26 +378,71 @@ export function CRM() {
                         <span className="text-sm">{lead.phone}</span>
                       </div>
                     )}
+                    {lead.linkedinProfile && (
+                      <div className="flex items-center gap-1">
+                        <Linkedin className="h-4 w-4" />
+                        <a
+                          href={lead.linkedinProfile}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-blue-600 hover:underline"
+                        >
+                          Profile
+                        </a>
+                      </div>
+                    )}
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant={getStatusColor(lead.status)}>
-                    {lead.status}
-                  </Badge>
+                  <Select
+                    value={lead.status}
+                    onValueChange={(value) => handleStatusChange(lead._id, value)}
+                  >
+                    <SelectTrigger className="w-[130px]">
+                      <SelectValue>
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(lead.status)}`}>
+                          {lead.status}
+                        </span>
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="new">New</SelectItem>
+                      <SelectItem value="contacted">Contacted</SelectItem>
+                      <SelectItem value="qualified">Qualified</SelectItem>
+                      <SelectItem value="proposal">Proposal</SelectItem>
+                      <SelectItem value="won">Won</SelectItem>
+                      <SelectItem value="lost">Lost</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="outline">
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getSourceColor(lead.source)}`}>
                     {lead.source}
-                  </Badge>
+                  </span>
                 </TableCell>
                 <TableCell>{format(new Date(lead.createdAt), 'MMM d, yyyy')}</TableCell>
                 <TableCell>
                   <div className="flex gap-2">
-                    <Link href={`mailto:${lead.email}`}>
-                      <Button size="sm" variant="outline">
-                        <Mail className="h-4 w-4" />
-                      </Button>
-                    </Link>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleEdit(lead)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setSelectedLead(lead);
+                        setShowActivityDialog(true);
+                      }}
+                    >
+                      <MessageSquarePlus className="h-4 w-4" />
+                    </Button>
+                    <Button size="sm" variant="outline">
+                      <Mail className="h-4 w-4" />
+                    </Button>
                     {lead.phone && (
                       <Button size="sm" variant="outline">
                         <Phone className="h-4 w-4" />
@@ -278,6 +455,50 @@ export function CRM() {
           </TableBody>
         </Table>
       </Card>
+
+      <Dialog open={showActivityDialog} onOpenChange={setShowActivityDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Activity Log - {selectedLead?.name}</DialogTitle>
+            <DialogDescription>
+              View activities and add notes
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="flex gap-2">
+              <Textarea
+                value={newNote}
+                onChange={(e) => setNewNote(e.target.value)}
+                placeholder="Add a note..."
+                className="flex-1"
+              />
+              <Button onClick={handleAddNote}>Add Note</Button>
+            </div>
+
+            <ScrollArea className="h-[300px] rounded-md border p-4">
+              {selectedLead?.activities?.map((activity, index) => (
+                <div
+                  key={index}
+                  className="mb-4 pb-4 border-b last:border-0"
+                >
+                  <div className="flex justify-between items-start">
+                    <p className="text-sm font-medium">
+                      {activity.note}
+                    </p>
+                    <span className="text-xs text-gray-500">
+                      {format(new Date(activity.timestamp), 'MMM d, yyyy h:mm a')}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Type: {activity.type}
+                  </p>
+                </div>
+              ))}
+            </ScrollArea>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

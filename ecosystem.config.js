@@ -14,7 +14,9 @@ module.exports = {
         LINKEDIN_CLIENT_ID: "78llc9qkg3ol4k",
         LINKEDIN_ACCESS_TOKEN: "WPL_AP1.5K51FwdZtbkaj3c7.U7kmxQ==",
         LINKEDIN_ORGANIZATION_ID: "https://www.linkedin.com/company/flyclim/",
-        LINKEDIN_REDIRECT_URI: "https://www.flyclim.com/api/linkedin/callback"
+        LINKEDIN_REDIRECT_URI: "https://www.flyclim.com/api/linkedin/callback",
+        NEXT_PUBLIC_BASE_URL: "https://www.flyclim.com",
+
       }
     }
   ]

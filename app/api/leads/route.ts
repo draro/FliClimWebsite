@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../auth/[...nextauth]/route';
 
@@ -59,6 +59,12 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     let client;
 
     try {
@@ -68,6 +74,11 @@ export async function POST(request: NextRequest) {
 
         const result = await db.collection('leads').insertOne({
             ...body,
+            activities: [{
+                type: 'created',
+                note: 'Lead created',
+                timestamp: new Date(),
+            }],
             createdAt: new Date(),
             updatedAt: new Date()
         });
@@ -79,6 +90,63 @@ export async function POST(request: NextRequest) {
     } catch (error) {
         console.error('Failed to create lead:', error);
         return NextResponse.json({ error: 'Failed to create lead' }, { status: 500 });
+    } finally {
+        if (client) {
+            await client.close();
+        }
+    }
+}
+
+export async function PUT(request: NextRequest) {
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    let client;
+
+    try {
+        const { _id, status, note, ...updateData } = await request.json();
+
+        client = await MongoClient.connect(process.env.MONGODB_URI as string);
+        const db = client.db('flyclim');
+
+        const changes = {
+            ...updateData,
+            updatedAt: new Date()
+        };
+
+        if (status) {
+            changes.status = status;
+        }
+
+        const activityEntry = {
+            type: status ? 'status_change' : note ? 'note_added' : 'lead_updated',
+            note: status ? `Status changed to ${status}` :
+                note ? note :
+                    'Lead information updated',
+            timestamp: new Date()
+        };
+
+        const result = await db.collection('leads').updateOne(
+            { _id: new ObjectId(_id) },
+            {
+                $set: changes,
+                $push: {
+                    activities: activityEntry,
+                },
+            } as any // ✅ safely override strict typing
+        );
+
+        if (result.matchedCount === 0) {
+            return NextResponse.json({ error: 'Lead not found' }, { status: 404 });
+        }
+
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        console.error('Failed to update lead:', error);
+        return NextResponse.json({ error: 'Failed to update lead' }, { status: 500 });
     } finally {
         if (client) {
             await client.close();

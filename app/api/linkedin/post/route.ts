@@ -1,93 +1,137 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../auth/[...nextauth]/route';
+import { MongoClient } from 'mongodb';
 import { cleanMarkdownForLinkedIn } from '@/utils/utils';
-import axios from 'axios'
 
 
-const getLinkedInAccessToken = async () => {
-  const url = 'https://www.linkedin.com/oauth/v2/accessToken';
-  const payload = new URLSearchParams({
-    grant_type: 'authorization_code',
-    code: 'AUTHORIZATION_CODE_FROM_CALLBACK',
-    redirect_uri: 'https://flyclim.com/api/linkedin/callback',
-    client_id: process.env.LINKEDIN_CLIENT_ID || '',
-    client_secret: process.env.LINKEDIN_ACCESS_TOKEN || '',
-  });
 
-  try {
-    const response = await axios.post(url, payload.toString(), {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    });
-
-    console.log('✅ Access Token:', response.data.access_token);
-    console.log('🕒 Expires In:', response.data.expires_in);
-
-    return response.data.access_token;
-  } catch (error: any) {
-    console.error('❌ Failed to get LinkedIn token:', error.response?.data || error.message);
-  }
-};
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
+  if (!process.env.MONGODB_URI) {
+    throw new Error('Missing MONGODB_URI');
+  }
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const accessToken = await getLinkedInAccessToken();
-  const orgId = process.env.LINKEDIN_ORGANIZATION_ID;
-
-  if (!accessToken || !orgId) {
-    console.error('Missing LinkedIn credentials');
-    return NextResponse.json(
-      { error: 'LinkedIn access token or organization ID missing' },
-      { status: 500 }
-    );
-  }
+  let client;
+  const { title, content, url } = await request.json();
 
   try {
-    const { title, content, url }: { title: string; content: string; url: string } =
-      await request.json();
 
+    // Get LinkedIn access token from MongoDB
+    client = await MongoClient.connect(process.env.MONGODB_URI);
+    const db = client.db('flyclim');
+    const settings = await db.collection('settings').findOne({});
+
+    if (!settings?.linkedinAccessToken || !settings?.linkedinMemberId) {
+      return NextResponse.json(
+        { error: 'LinkedIn not connected' },
+        { status: 401 }
+      );
+    }
+
+    // Check if token is expired
+    if (settings.linkedinTokenExpiry && new Date(settings.linkedinTokenExpiry) < new Date()) {
+      return NextResponse.json(
+        { error: 'token_expired' },
+        { status: 401 }
+      );
+    }
+
+    // Clean markdown content for LinkedIn
     const cleanContent = cleanMarkdownForLinkedIn(content);
-    const formattedMessage = `${title}\n\n${cleanContent}\n\nRead more: ${url}`;
 
-    const linkedInPayload = {
-      author: `urn:li:organization:${orgId}`,
-      lifecycleState: 'PUBLISHED',
-      specificContent: {
-        'com.linkedin.ugc.ShareContent': {
-          shareCommentary: {
-            text: formattedMessage,
-          },
-          shareMediaCategory: 'NONE', // Or "ARTICLE" if you add media
-        },
-      },
-      visibility: {
-        'com.linkedin.ugc.MemberNetworkVisibility': 'PUBLIC',
-      },
-    };
-
-    const linkedInResponse = await fetch('https://api.linkedin.com/v2/ugcPosts', {
+    // Create share using LinkedIn Share API
+    const response = await fetch('https://api.linkedin.com/v2/ugcPosts', {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        'Authorization': `Bearer ${settings.linkedinAccessToken}`,
         'Content-Type': 'application/json',
         'X-Restli-Protocol-Version': '2.0.0',
       },
-      body: JSON.stringify(linkedInPayload),
+      body: JSON.stringify({
+        author: `urn:li:person:${settings.linkedinMemberId}`,
+        lifecycleState: 'PUBLISHED',
+        specificContent: {
+          'com.linkedin.ugc.ShareContent': {
+            shareCommentary: {
+              text: `${title}\n\n${cleanContent}\n\nRead more: ${url}`
+            },
+            shareMediaCategory: 'ARTICLE',
+            media: [{
+              status: 'READY',
+              originalUrl: url,
+              title: {
+                text: title
+              },
+              description: {
+                text: cleanContent.substring(0, 200) + '...'
+              }
+            }]
+          }
+        },
+        visibility: {
+          'com.linkedin.ugc.MemberNetworkVisibility': 'PUBLIC'
+        }
+      })
     });
 
-    if (!linkedInResponse.ok) {
-      const error = await linkedInResponse.json();
-      console.error('LinkedIn API Error:', error);
-      return NextResponse.json({ error: 'Failed to post to LinkedIn', detail: error }, { status: linkedInResponse.status });
+    if (!response.ok) {
+      const error = await response.json();
+      console.error('LinkedIn API error:', error);
+
+      if (response.status === 401) {
+        return NextResponse.json(
+          { error: 'token_expired' },
+          { status: 401 }
+        );
+      }
+
+      throw new Error('Failed to post to LinkedIn');
     }
 
-    const data = await linkedInResponse.json();
-    return NextResponse.json({ success: true, postId: data.id });
+    const data = await response.json();
+
+    // Store the share in MongoDB for tracking
+    await db.collection('linkedin_shares').insertOne({
+      shareId: data.id,
+      title,
+      url,
+      sharedAt: new Date(),
+      status: 'success'
+    });
+
+    return NextResponse.json({
+      success: true,
+      shareId: data.id
+    });
   } catch (error) {
-    console.error('Unexpected error while posting to LinkedIn:', error);
-    return NextResponse.json({ error: 'Unexpected error' }, { status: 500 });
+    console.error('Failed to post to LinkedIn:', error);
+
+    if (client) {
+      try {
+        // Log failed share attempt
+        await client.db('flyclim').collection('linkedin_shares').insertOne({
+          title,
+          url,
+          sharedAt: new Date(),
+          status: 'failed',
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
+      } catch (logError) {
+        console.error('Failed to log share error:', logError);
+      }
+    }
+
+    return NextResponse.json(
+      { error: 'Failed to post to LinkedIn' },
+      { status: 500 }
+    );
+  } finally {
+    if (client) {
+      await client.close();
+    }
   }
 }
