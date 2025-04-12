@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '../auth/[...nextauth]/route';
+import { authOptions } from '../../auth/[...nextauth]/route';
 import { MongoClient } from 'mongodb';
 
 const oauth2Client = new google.auth.OAuth2(
@@ -47,8 +47,7 @@ export async function GET(request: NextRequest) {
     // Get tasks from each list
     const allTasks = [];
     for (const list of taskLists.data.items || []) {
-      if (!list.id) continue; // ✅ Skip invalid task lists
-
+      if (!list.id) continue; // Skip invalid task lists
       const taskResponse = await tasks.tasks.list({
         tasklist: list.id,
         showCompleted: true,

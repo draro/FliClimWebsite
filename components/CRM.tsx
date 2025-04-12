@@ -26,6 +26,7 @@ import { format } from 'date-fns';
 import { UserPlus, Mail, Phone, Linkedin, MessageSquarePlus, Pencil, Calendar } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { TaskList } from '@/components/TaskList';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface Lead {
   _id: string;
@@ -59,7 +60,8 @@ export function CRM() {
     title: '',
     description: '',
     startTime: '',
-    endTime: ''
+    endTime: '',
+    createMeet: false
   });
 
   const [formData, setFormData] = useState({
@@ -95,7 +97,7 @@ export function CRM() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       const response = await fetch('/api/leads', {
         method: isEditing ? 'PUT' : 'POST',
@@ -202,7 +204,8 @@ export function CRM() {
         title: '',
         description: '',
         startTime: '',
-        endTime: ''
+        endTime: '',
+        createMeet: false
       });
       setShowCalendarDialog(false);
       fetchLeads();
@@ -626,6 +629,22 @@ export function CRM() {
                   required
                 />
               </div>
+            </div>
+
+            <div className="flex items-center space-x-2 mt-4">
+              <Checkbox
+                id="createMeet"
+                checked={calendarEvent.createMeet}
+                onCheckedChange={(checked) =>
+                  setCalendarEvent(prev => ({ ...prev, createMeet: checked as boolean }))
+                }
+              />
+              <label
+                htmlFor="createMeet"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Create Google Meet link
+              </label>
             </div>
 
             <div className="flex justify-end gap-2">

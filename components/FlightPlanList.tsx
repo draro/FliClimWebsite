@@ -86,8 +86,20 @@ export function FlightPlanList({ onViewFlight, onAddFlight, risk_factors }: Flig
                         <span className="text-xs font-medium">Medium Risk</span>
                     </div>
                 );
+            case 'low':
+                return (
+                    <div className="flex items-center gap-1 text-green-600">
+                        <AlertTriangle className="h-4 w-4" />
+                        <span className="text-xs font-medium">Low Risk</span>
+                    </div>
+                );
             default:
-                return null;
+                return (
+                    <div className="flex items-center gap-1 text-grey-600">
+                        <AlertTriangle className="h-4 w-4" />
+                        <span className="text-xs font-medium">N/A</span>
+                    </div>
+                );
         }
     };
 

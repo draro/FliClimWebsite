@@ -580,7 +580,7 @@ export default function CesiumViewer() {
 
       {/* Flight List Panel */}
       <div className={`absolute top-4 left-20 transition-transform duration-300 `}>
-        <div className={`w-[400px] bg-white/95 backdrop-blur-sm shadow-lg rounded-lg ${!showFlightList && 'hidden m-20'}`}>
+        <div className={`w-[800px] h-[500px] overflow-auto bg-white/95 backdrop-blur-sm shadow-lg rounded-lg ${!showFlightList && 'hidden m-20'}`}>
           <FlightPlanList
             onViewFlight={handleViewFlight}
             onAddFlight={null}
