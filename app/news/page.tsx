@@ -6,6 +6,17 @@ import { Footer } from '@/components/Footer';
 export const metadata: Metadata = {
   title: 'News',
   description: 'Latest news and announcements from FlyClim.',
+  openGraph: {
+    title: 'FlyClim News - Aviation Weather Updates',
+    description: 'Latest news and announcements from FlyClim.',
+    images: ['/logo.png'],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'FlyClim News - Aviation Weather Updates',
+    description: 'Latest news and announcements from FlyClim.',
+    images: ['/logo.png'],
+  }
 };
 
 export default function NewsPage() {

@@ -2,10 +2,10 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { 
-  LayoutDashboard, 
-  Users, 
-  Calendar, 
+import {
+  LayoutDashboard,
+  Users,
+  Calendar,
   Settings as SettingsIcon,
   FileText,
   LogOut
@@ -13,7 +13,18 @@ import {
 import { Button } from '@/components/ui/button';
 import { useSession, signOut } from 'next-auth/react';
 
-
+// export const metadata = {
+//   robots: {
+//     index: false,
+//     follow: false,
+//     nocache: true,
+//     googleBot: {
+//       index: false,
+//       follow: false,
+//       noimageindex: true,
+//     },
+//   },
+// };
 export default function AdminLayout({
   children,
 }: {

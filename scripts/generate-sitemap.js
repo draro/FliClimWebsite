@@ -82,9 +82,13 @@ ${urls.map(url => `  <url>
     console.log('✅ Sitemap generated successfully!');
 
     // Generate robots.txt if it doesn't exist
-    const robotsTxt = `User-agent: *
+    const robotsTxt = `# https://www.robotstxt.org/robotstxt.html
+User-agent: *
 Allow: /
+Disallow: /admin/
+Disallow: /api/
 
+# Sitemap
 Sitemap: ${DOMAIN}/sitemap.xml`;
 
     fs.writeFileSync(path.join(publicDir, 'robots.txt'), robotsTxt);

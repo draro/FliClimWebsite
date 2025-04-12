@@ -1,11 +1,10 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { FPLForm } from '@/components/FPLForm';
 import { WebSocketStatus } from '@/components/WebSocketStatus';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, AlertTriangle } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -13,6 +12,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { FlightPlanList } from '@/components/FlightPlanList';
+import type { LineString } from 'geojson';
 
 declare global {
   interface Window {
@@ -23,6 +24,10 @@ declare global {
 interface RouteResponse {
   type: string;
   features: any[];
+  original_route?: {
+    type: "Feature";
+    geometry: LineString;
+  };
   properties?: {
     storm_detected: boolean;
     extra_time_minutes: number;
@@ -30,13 +35,6 @@ interface RouteResponse {
     risk_level: string;
     risk_factors: string[];
     fpl_string: string;
-    original_route: {
-      type: string;
-      geometry: {
-        type: "LineString";
-        coordinates: number[][];
-      };
-    };
   };
 }
 
@@ -90,7 +88,7 @@ export default function CesiumViewer() {
   const currentStormLayer = useRef<any[]>([]);
   const lastTimeBucket = useRef<string>('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showFPL, setShowFPL] = useState(true);
+  const [showFlightList, setShowFlightList] = useState(true);
   const [routeData, setRouteData] = useState<RouteResponse | null>(null);
   const [showAirportRisk, setShowAirportRisk] = useState(false);
   const [selectedAirport, setSelectedAirport] = useState<AirportRisk | null>(null);
@@ -133,7 +131,7 @@ export default function CesiumViewer() {
   const fetchAirportRisk = async (icao: string) => {
     try {
       setIsLoadingAirport(true);
-      const response = await fetch(`https://amss.xtreme-weather.com/api/airport_risk/${icao}`);
+      const response = await fetch(`https://demo.flyclim.com/api/airport_risk/${icao}`);
       if (!response.ok) throw new Error('Failed to fetch airport risk data');
       const data = await response.json();
       setSelectedAirport(data);
@@ -358,6 +356,31 @@ export default function CesiumViewer() {
     img.src = style.iconUrl;
   };
 
+  const handleViewFlight = async (fpl: string) => {
+    try {
+      setIsLoading(true);
+      const response = await fetch('https://demo.flyclim.com/api/route', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fpl })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to visualize route');
+      }
+
+      const data = await response.json();
+      visualizeRoute(data, fpl);
+      setShowFlightList(false);
+    } catch (error) {
+      console.error('Failed to visualize flight:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  function isLineString(type: any): type is LineString {
+    return type === "LineString";
+  }
   const visualizeRoute = async (data: RouteResponse, fpl: string) => {
     try {
       if (!data || data.type !== 'FeatureCollection' || !data.features.length) {
@@ -372,10 +395,9 @@ export default function CesiumViewer() {
       viewer.dataSources.removeAll();
       viewer.entities.removeAll();
 
-      // Display original route if available
-      if (data.properties?.original_route?.geometry?.coordinates) {
-        const originalCoords = data.properties.original_route.geometry.coordinates;
-        const originalPositions = originalCoords
+      // If original route exists, display it first
+      if (isLineString(data.original_route?.geometry.type)) {
+        const originalPositions = data.original_route.geometry.coordinates
           .map(([lon, lat]) => safeFromDegrees(lon, lat, 10600))
           .filter(p => p);
 
@@ -383,8 +405,8 @@ export default function CesiumViewer() {
           polyline: {
             positions: originalPositions,
             width: 3,
-            material: window.Cesium.Color.ORANGE.withAlpha(0.6),
-            clampToGround: false
+            material: window.Cesium.Color.ORANGE.withAlpha(0.5),
+            clampToGround: true
           }
         });
       }
@@ -403,6 +425,7 @@ export default function CesiumViewer() {
         .filter((p): p is SafePoint => p.time !== null)
         .sort((a, b) => a.time.getTime() - b.time.getTime());
 
+      // Extract ADEP and ADES from FPL
       const adepMatch = fpl.match(/-([A-Z]{4})\d{4}/);
       const adesMatch = fpl.match(/-([A-Z]{4})\d{4}$/);
 
@@ -410,6 +433,7 @@ export default function CesiumViewer() {
         const adep = adepMatch[1];
         const ades = adesMatch[1];
 
+        // Create clickable entities for airports
         safePoints.forEach((point, index) => {
           if (index === 0 || index === safePoints.length - 1) {
             const icao = index === 0 ? adep : ades;
@@ -432,6 +456,7 @@ export default function CesiumViewer() {
                 }
               });
 
+              // Add click handler
               viewer.screenSpaceEventHandler.setInputAction(async (click: any) => {
                 const pickedObject = viewer.scene.pick(click.position);
                 if (window.Cesium.defined(pickedObject)) {
@@ -478,7 +503,7 @@ export default function CesiumViewer() {
         polyline: {
           positions,
           width: 3,
-          material: window.Cesium.Color.CYAN.withAlpha(0.8)
+          material: window.Cesium.Color.CYAN
         }
       });
 
@@ -535,8 +560,6 @@ export default function CesiumViewer() {
           roll: 0
         }
       });
-
-      setShowFPL(false);
     } finally {
       setIsLoading(false);
     }
@@ -554,66 +577,54 @@ export default function CesiumViewer() {
   return (
     <div className="relative w-full h-screen">
       <div id="cesiumContainer" className="absolute inset-0" />
-      <div className={`absolute top-4 left-4 transition-transform duration-300 ${showFPL ? 'translate-x-0' : '-translate-x-[calc(100%+16px)]'}`}>
-        <FPLForm onVisualize={visualizeRoute} onLoad={() => setIsLoading(true)} routeData={routeData} />
+
+      {/* Flight List Panel */}
+      <div className={`absolute top-4 left-20 transition-transform duration-300 `}>
+        <div className={`w-[400px] bg-white/95 backdrop-blur-sm shadow-lg rounded-lg ${!showFlightList && 'hidden m-20'}`}>
+          <FlightPlanList
+            onViewFlight={handleViewFlight}
+            onAddFlight={null}
+            risk_factors={routeData?.properties}
+          />
+        </div>
         <Button
           variant="secondary"
           size="sm"
           className="absolute -right-10 top-0 bg-white/95"
-          onClick={() => setShowFPL(!showFPL)}
+          onClick={() => setShowFlightList(!showFlightList)}
         >
-          {showFPL ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+          {showFlightList ? <ChevronLeft className="h-4 w-4" /> : "Flight Plans"}
         </Button>
       </div>
+
       <WebSocketStatus />
       <LoadingSpinner isVisible={isLoading || isLoadingAirport} />
 
-      <Sheet open={showAirportRisk} onOpenChange={setShowAirportRisk}>
-        <SheetContent>
-          <SheetHeader>
-            <SheetTitle>Airport Risk Assessment - {selectedAirport?.icao}</SheetTitle>
-            <SheetDescription>
-              {selectedAirport && (
-                <div className="space-y-4 pt-4">
-                  <div className="bg-blue-50 p-4 rounded-lg">
-                    <h3 className="font-semibold mb-2">Current Weather (METAR)</h3>
-                    <p className="font-mono text-sm">{selectedAirport.metar.raw}</p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <h3 className="font-semibold">Risk Assessment</h3>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="bg-gray-50 p-3 rounded">
-                        <p className="text-sm text-gray-600">Wind Risk</p>
-                        <p className="font-semibold">{selectedAirport.risk.wind_risk}%</p>
-                      </div>
-                      <div className="bg-gray-50 p-3 rounded">
-                        <p className="text-sm text-gray-600">Visibility Risk</p>
-                        <p className="font-semibold">{selectedAirport.risk.visibility_risk}%</p>
-                      </div>
+      {/* Risk Analysis Sheet */}
+      {routeData?.properties?.risk_factors && (
+        <Sheet>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle className="flex items-center gap-2 text-red-600">
+                <AlertTriangle className="h-5 w-5" />
+                Flight Risk Analysis
+              </SheetTitle>
+              <SheetDescription>
+                <div className="mt-4 space-y-4">
+                  {routeData.properties.risk_factors?.map((risk: string, index: number) => (
+                    <div
+                      key={index}
+                      className="flex items-start gap-2 text-left"
+                    >
+                      <span className="text-red-500">{risk}</span>
                     </div>
-                  </div>
-
-                  <div className={`p-4 rounded-lg ${selectedAirport.risk.risk_classification === 'high' ? 'bg-red-50 text-red-700' :
-                    selectedAirport.risk.risk_classification === 'medium' ? 'bg-yellow-50 text-yellow-700' :
-                      'bg-green-50 text-green-700'
-                    }`}>
-                    <h3 className="font-semibold capitalize mb-2">
-                      {selectedAirport.risk.risk_classification} Risk Level
-                    </h3>
-                    <p className="text-sm">
-                      Total Risk Score: {selectedAirport.risk.total_risk}%
-                    </p>
-                    <p className="text-sm mt-2">
-                      Delay Probability: {selectedAirport.flight_delay.delay_probability}
-                    </p>
-                  </div>
+                  ))}
                 </div>
-              )}
-            </SheetDescription>
-          </SheetHeader>
-        </SheetContent>
-      </Sheet>
+              </SheetDescription>
+            </SheetHeader>
+          </SheetContent>
+        </Sheet>
+      )}
     </div>
   );
 }

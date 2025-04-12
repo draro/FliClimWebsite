@@ -4,13 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && npm run generate-sitemap",
+    "build": "npm run generate-sitemap && next build",
     "start": "next start",
     "lint": "next lint",
     "generate-sitemap": "node scripts/generate-sitemap.js"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
+    "@google-cloud/local-auth": "^3.0.1",
     "@hookform/resolvers": "^3.9.0",
     "@hubspot/api-client": "^11.1.0",
     "@next/swc-wasm-nodejs": "13.5.1",
@@ -41,8 +42,6 @@
     "@radix-ui/react-toggle": "^1.0.3",
     "@radix-ui/react-toggle-group": "^1.0.4",
     "@radix-ui/react-tooltip": "^1.0.7",
-    "@types/node": "20.6.2",
-    "@types/react": "18.2.22",
     "@types/react-dom": "18.2.7",
     "@types/react-syntax-highlighter": "^15.5.13",
     "@uploadthing/react": "^7.3.0",
@@ -62,7 +61,9 @@
     "eslint": "8.49.0",
     "eslint-config-next": "13.5.1",
     "framer-motion": "^11.0.8",
+    "geojson": "^0.5.0",
     "github-markdown-css": "^5.8.1",
+    "googleapis": "^148.0.0",
     "input-otp": "^1.2.2",
     "linkedin-api-client": "^0.3.0",
     "lucide-react": "^0.344.0",
@@ -93,12 +94,15 @@
     "tailwind-merge": "^2.1.0",
     "tailwindcss": "3.3.3",
     "tailwindcss-animate": "^1.0.7",
-    "typescript": "5.2.2",
     "uploadthing": "^7.6.0",
     "vaul": "^0.9.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@types/react-big-calendar": "^1.16.1"
+    "@types/geojson": "^7946.0.16",
+    "@types/node": "^22.14.1",
+    "@types/react": "^18.3.20",
+    "@types/react-big-calendar": "^1.16.1",
+    "typescript": "^5.8.3"
   }
 }

@@ -14,7 +14,7 @@ export async function POST(request: Request) {
         client = await MongoClient.connect(process.env.MONGODB_URI!);
         const db = client.db('flyclim');
         const user = await db.collection('users').findOne({ email });
-
+        console.log(user)
         if (!user || !user.password) {
             return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
         }

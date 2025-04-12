@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
         client = await MongoClient.connect(process.env.MONGODB_URI);
         const db = client.db('flyclim');
 
-        const flights = await db.collection('flight_plan')
+        const flights = await db.collection('flight_plans')
             .find({})
             .sort({ dep_time: -1 })
             .toArray();
@@ -57,16 +57,20 @@ export async function POST(request: NextRequest) {
 
         const data = await response.json();
 
-        // // Store in MongoDB
-        // client = await MongoClient.connect(process.env.MONGODB_URI);
-        // const db = client.db('flyclim');
+        // Store in MongoDB
+        client = await MongoClient.connect(process.env.MONGODB_URI);
+        const db = client.db('flyclim');
 
-        // const result = await db.collection('flight_plan').insertOne({
-        //     ...data,
-        //     createdAt: new Date()
-        // });
+        const result = await db.collection('flight_plan').insertOne({
+            ...data,
+            createdAt: new Date()
+        });
 
-        return NextResponse.json(response);
+        return NextResponse.json({
+            success: true,
+            _id: result.insertedId.toString(),
+            ...data
+        });
     } catch (error) {
         console.error('Failed to create flight:', error);
         return NextResponse.json(

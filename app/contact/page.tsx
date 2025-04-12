@@ -6,7 +6,19 @@ import { Footer } from '@/components/Footer';
 export const metadata: Metadata = {
   title: 'Contact Us',
   description: 'Get in touch with FlyClim for inquiries about our aviation weather optimization solutions.',
+  openGraph: {
+    title: 'Contact FlyClim - Aviation Weather Solutions',
+    description: 'Get in touch with FlyClim for inquiries about our aviation weather optimization solutions.',
+    images: ['/logo.png'],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Contact FlyClim - Aviation Weather Solutions',
+    description: 'Get in touch with FlyClim for inquiries about our aviation weather optimization solutions.',
+    images: ['/logo.png'],
+  }
 };
+
 
 export default function ContactPage() {
   return (

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Linkedin } from 'lucide-react';
+import { Linkedin, Calendar } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 
 interface Settings {
@@ -13,6 +13,8 @@ interface Settings {
   linkedinPageId?: string;
   linkedinOrganizationId?: string;
   linkedinTokenExpiry?: string;
+  googleAccessToken?: string;
+  googleTokenExpiry?: string;
 }
 
 export function Settings() {
@@ -31,6 +33,7 @@ export function Settings() {
     if (error) {
       const errorMessages: Record<string, string> = {
         linkedin_auth_failed: 'LinkedIn authentication failed',
+        google_auth_failed: 'Google Calendar authentication failed',
         invalid_state: 'Invalid state parameter',
         no_code: 'No authorization code received',
         token_exchange_failed: 'Failed to exchange code for access token',
@@ -39,7 +42,7 @@ export function Settings() {
 
       toast({
         title: 'Error',
-        description: errorMessages[error] || 'Failed to connect to LinkedIn',
+        description: errorMessages[error] || 'Failed to connect service',
         variant: 'destructive'
       });
     }
@@ -47,7 +50,7 @@ export function Settings() {
     if (success) {
       toast({
         title: 'Success',
-        description: 'LinkedIn connected successfully'
+        description: 'Service connected successfully'
       });
     }
   }, [searchParams, toast]);
@@ -82,9 +85,22 @@ export function Settings() {
     }
   };
 
+  const handleConnectGoogle = async () => {
+    try {
+      window.location.href = '/api/calendar/auth';
+    } catch (error) {
+      console.error('Failed to initiate Google auth:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to connect to Google Calendar',
+        variant: 'destructive'
+      });
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    
     try {
       const response = await fetch('/api/settings', {
         method: 'POST',
@@ -149,6 +165,35 @@ export function Settings() {
                   placeholder="LinkedIn Organization ID"
                 />
               </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Calendar className="h-5 w-5" />
+              Google Calendar Integration
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Connection Status</label>
+                <div className="flex items-center gap-4">
+                  <div className={`h-3 w-3 rounded-full ${settings.googleAccessToken ? 'bg-green-500' : 'bg-red-500'}`} />
+                  <span>{settings.googleAccessToken ? 'Connected' : 'Not Connected'}</span>
+                  {settings.googleTokenExpiry && (
+                    <span className="text-sm text-gray-500">
+                      (Expires: {new Date(settings.googleTokenExpiry).toLocaleDateString()})
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <Button
+                type="button"
+                onClick={handleConnectGoogle}
+                className="w-full"
+              >
+                {settings.googleAccessToken ? 'Reconnect Google Calendar' : 'Connect Google Calendar'}
+              </Button>
             </div>
           </div>
 

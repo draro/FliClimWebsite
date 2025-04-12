@@ -6,6 +6,17 @@ import { Footer } from '@/components/Footer';
 export const metadata: Metadata = {
   title: 'Pilot Program',
   description: 'Join FlyClim\'s pilot program and be among the first to experience our revolutionary weather optimization technology.',
+  openGraph: {
+    title: 'FlyClim Pilot Program - Early Access',
+    description: 'Join FlyClim\'s pilot program and be among the first to experience our revolutionary weather optimization technology.',
+    images: ['/logo.png'],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'FlyClim Pilot Program - Early Access',
+    description: 'Join FlyClim\'s pilot program and be among the first to experience our revolutionary weather optimization technology.',
+    images: ['/logo.png'],
+  }
 };
 
 export default function PilotProgramPage() {

@@ -23,8 +23,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { format } from 'date-fns';
-import { UserPlus, Mail, Phone, Linkedin, MessageSquarePlus, Pencil } from 'lucide-react';
+import { UserPlus, Mail, Phone, Linkedin, MessageSquarePlus, Pencil, Calendar } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { TaskList } from '@/components/TaskList';
 
 interface Lead {
   _id: string;
@@ -39,6 +40,7 @@ interface Lead {
     type: string;
     note: string;
     timestamp: string;
+    eventId?: string;
   }>;
   createdAt: string;
 }
@@ -49,9 +51,17 @@ export function CRM() {
   const [isLoading, setIsLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [showActivityDialog, setShowActivityDialog] = useState(false);
+  const [showCalendarDialog, setShowCalendarDialog] = useState(false);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [newNote, setNewNote] = useState('');
   const [isEditing, setIsEditing] = useState(false);
+  const [calendarEvent, setCalendarEvent] = useState({
+    title: '',
+    description: '',
+    startTime: '',
+    endTime: ''
+  });
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -85,7 +95,7 @@ export function CRM() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    
     try {
       const response = await fetch('/api/leads', {
         method: isEditing ? 'PUT' : 'POST',
@@ -118,6 +128,89 @@ export function CRM() {
       toast({
         title: 'Error',
         description: isEditing ? 'Failed to update lead' : 'Failed to create lead',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleAddNote = async () => {
+    if (!selectedLead || !newNote.trim()) return;
+
+    try {
+      const response = await fetch('/api/leads', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          _id: selectedLead._id,
+          note: newNote
+        })
+      });
+
+      if (!response.ok) throw new Error('Failed to add note');
+
+      toast({
+        title: 'Success',
+        description: 'Note added successfully'
+      });
+
+      setNewNote('');
+      fetchLeads();
+    } catch (error) {
+      console.error('Failed to add note:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to add note',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleCreateEvent = async () => {
+    if (!selectedLead) return;
+
+    try {
+      const response = await fetch('/api/calendar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          leadId: selectedLead._id,
+          ...calendarEvent
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        if (error.error === 'Google Calendar not connected') {
+          toast({
+            title: 'Error',
+            description: 'Please connect Google Calendar in Settings first',
+            variant: 'destructive'
+          });
+          return;
+        }
+        throw new Error('Failed to create event');
+      }
+
+      const data = await response.json();
+
+      toast({
+        title: 'Success',
+        description: 'Calendar event created successfully'
+      });
+
+      setCalendarEvent({
+        title: '',
+        description: '',
+        startTime: '',
+        endTime: ''
+      });
+      setShowCalendarDialog(false);
+      fetchLeads();
+    } catch (error) {
+      console.error('Failed to create event:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to create calendar event',
         variant: 'destructive'
       });
     }
@@ -162,38 +255,6 @@ export function CRM() {
       toast({
         title: 'Error',
         description: 'Failed to update lead status',
-        variant: 'destructive'
-      });
-    }
-  };
-
-  const handleAddNote = async () => {
-    if (!selectedLead || !newNote.trim()) return;
-
-    try {
-      const response = await fetch('/api/leads', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          _id: selectedLead._id,
-          note: newNote
-        })
-      });
-
-      if (!response.ok) throw new Error('Failed to add note');
-
-      toast({
-        title: 'Success',
-        description: 'Note added successfully'
-      });
-
-      setNewNote('');
-      fetchLeads();
-    } catch (error) {
-      console.error('Failed to add note:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to add note',
         variant: 'destructive'
       });
     }
@@ -440,14 +501,16 @@ export function CRM() {
                     >
                       <MessageSquarePlus className="h-4 w-4" />
                     </Button>
-                    <Button size="sm" variant="outline">
-                      <Mail className="h-4 w-4" />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setSelectedLead(lead);
+                        setShowCalendarDialog(true);
+                      }}
+                    >
+                      <Calendar className="h-4 w-4" />
                     </Button>
-                    {lead.phone && (
-                      <Button size="sm" variant="outline">
-                        <Phone className="h-4 w-4" />
-                      </Button>
-                    )}
                   </div>
                 </TableCell>
               </TableRow>
@@ -457,46 +520,120 @@ export function CRM() {
       </Card>
 
       <Dialog open={showActivityDialog} onOpenChange={setShowActivityDialog}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden flex flex-col">
           <DialogHeader>
-            <DialogTitle>Activity Log - {selectedLead?.name}</DialogTitle>
+            <DialogTitle>Lead Activities - {selectedLead?.name}</DialogTitle>
             <DialogDescription>
-              View activities and add notes
+              View activities, add notes, and manage tasks
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4">
-            <div className="flex gap-2">
-              <Textarea
-                value={newNote}
-                onChange={(e) => setNewNote(e.target.value)}
-                placeholder="Add a note..."
-                className="flex-1"
-              />
-              <Button onClick={handleAddNote}>Add Note</Button>
+          <div className="grid grid-cols-2 gap-8 flex-1 overflow-hidden">
+            <div className="space-y-4">
+              <div className="flex gap-2">
+                <Textarea
+                  value={newNote}
+                  onChange={(e) => setNewNote(e.target.value)}
+                  placeholder="Add a note..."
+                  className="flex-1"
+                />
+                <Button onClick={handleAddNote}>Add Note</Button>
+              </div>
+
+              <ScrollArea className="h-[400px] rounded-md border p-4">
+                {selectedLead?.activities?.map((activity, index) => (
+                  <div
+                    key={index}
+                    className="mb-4 pb-4 border-b last:border-0"
+                  >
+                    <div className="flex justify-between items-start">
+                      <p className="text-sm font-medium">
+                        {activity.note}
+                      </p>
+                      <span className="text-xs text-gray-500">
+                        {format(new Date(activity.timestamp), 'MMM d, yyyy h:mm a')}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Type: {activity.type}
+                    </p>
+                    {activity.eventId && (
+                      <a
+                        href={`https://calendar.google.com/calendar/event?eid=${activity.eventId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-blue-600 hover:underline mt-1 inline-block"
+                      >
+                        View in Calendar
+                      </a>
+                    )}
+                  </div>
+                ))}
+              </ScrollArea>
             </div>
 
-            <ScrollArea className="h-[300px] rounded-md border p-4">
-              {selectedLead?.activities?.map((activity, index) => (
-                <div
-                  key={index}
-                  className="mb-4 pb-4 border-b last:border-0"
-                >
-                  <div className="flex justify-between items-start">
-                    <p className="text-sm font-medium">
-                      {activity.note}
-                    </p>
-                    <span className="text-xs text-gray-500">
-                      {format(new Date(activity.timestamp), 'MMM d, yyyy h:mm a')}
-                    </span>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Type: {activity.type}
-                  </p>
-                </div>
-              ))}
-            </ScrollArea>
+            <div className="border-l pl-8">
+              <TaskList leadId={selectedLead?._id} />
+            </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showCalendarDialog} onOpenChange={setShowCalendarDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Schedule Meeting - {selectedLead?.name}</DialogTitle>
+            <DialogDescription>
+              Create a calendar event for this lead
+            </DialogDescription>
+          </DialogHeader>
+
+          <form className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Event Title</label>
+              <Input
+                value={calendarEvent.title}
+                onChange={e => setCalendarEvent(prev => ({ ...prev, title: e.target.value }))}
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Description</label>
+              <Textarea
+                value={calendarEvent.description}
+                onChange={e => setCalendarEvent(prev => ({ ...prev, description: e.target.value }))}
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Start Time</label>
+                <Input
+                  type="datetime-local"
+                  value={calendarEvent.startTime}
+                  onChange={e => setCalendarEvent(prev => ({ ...prev, startTime: e.target.value }))}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">End Time</label>
+                <Input
+                  type="datetime-local"
+                  value={calendarEvent.endTime}
+                  onChange={e => setCalendarEvent(prev => ({ ...prev, endTime: e.target.value }))}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2">
+              <Button type="button" onClick={handleCreateEvent}>
+                Create Event
+              </Button>
+            </div>
+          </form>
         </DialogContent>
       </Dialog>
     </div>
