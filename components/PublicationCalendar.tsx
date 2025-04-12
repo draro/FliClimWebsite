@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Calendar as CalendarIcon, Plus, Share2, ListTodo } from 'lucide-react';
+import { Calendar as CalendarIcon, Plus, Share2, ListTodo, Video } from 'lucide-react';
 import { TaskList } from '@/components/TaskList';
 import type { TaskStatus } from '@/app/api/tasks/route';
 
@@ -57,13 +57,19 @@ interface Task {
   status: TaskStatus;
 }
 
-interface GoogleTask {
+interface GoogleEvent {
   id: string;
-  title: string;
-  notes?: string;
-  due?: string;
-  status: 'needsAction' | 'completed';
-  listTitle?: string;
+  summary: string;
+  description?: string;
+  start: { dateTime: string };
+  end: { dateTime: string };
+  conferenceData?: {
+    conferenceId: string;
+    entryPoints: Array<{
+      entryPointType: string;
+      uri: string;
+    }>;
+  };
 }
 
 const STATUS_COLORS: Record<TaskStatus, string> = {
@@ -81,7 +87,6 @@ export function PublicationCalendar() {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEventDialog, setShowEventDialog] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
-  const [googleTasks, setGoogleTasks] = useState<GoogleTask[]>([]);
   const [formData, setFormData] = useState({
     title: '',
     topic: '',
@@ -96,7 +101,7 @@ export function PublicationCalendar() {
   useEffect(() => {
     fetchSchedule();
     fetchTasks();
-    fetchGoogleTasks();
+    fetchCalendarEvents();
   }, []);
 
   const fetchSchedule = async () => {
@@ -154,9 +159,9 @@ export function PublicationCalendar() {
     }
   };
 
-  const fetchGoogleTasks = async () => {
+  const fetchCalendarEvents = async () => {
     try {
-      const response = await fetch('/api/calendar/tasks');
+      const response = await fetch('/api/calendar/events');
       if (!response.ok) {
         if (response.status === 401) {
           toast({
@@ -166,26 +171,24 @@ export function PublicationCalendar() {
           });
           return;
         }
-        throw new Error('Failed to fetch Google tasks');
+        throw new Error('Failed to fetch calendar events');
       }
       const data = await response.json();
 
-      // Convert Google tasks to calendar events
-      const taskEvents = data.tasks
-        .filter((task: GoogleTask) => task.due) // Only include tasks with due dates
-        .map((task: GoogleTask) => ({
-          id: task.id,
-          title: `[${task.listTitle}] ${task.title}`,
-          start: new Date(task.due!),
-          end: new Date(task.due!),
-          status: task.status,
-          description: task.notes,
-          eventType: 'google_task'
-        }));
+      // Convert Google Calendar events to calendar events
+      const calendarEvents = data.events.map((event: GoogleEvent) => ({
+        id: event.id,
+        title: event.summary,
+        start: new Date(event.start.dateTime),
+        end: new Date(event.end.dateTime),
+        description: event.description,
+        meetLink: event.conferenceData?.entryPoints?.[0]?.uri,
+        eventType: 'calendar'
+      }));
 
-      setEvents(prev => [...prev, ...taskEvents]);
+      setEvents(prev => [...prev, ...calendarEvents]);
     } catch (error) {
-      console.error('Failed to fetch Google tasks:', error);
+      console.error('Failed to fetch calendar events:', error);
     }
   };
 
@@ -273,6 +276,7 @@ export function PublicationCalendar() {
       }
     };
   };
+
   return (
     <div className="min-h-[800px] flex flex-col">
       <div className="flex justify-between items-center mb-6">
@@ -293,7 +297,6 @@ export function PublicationCalendar() {
                 </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-                {/* Existing form fields */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-1">Type</label>
@@ -432,7 +435,35 @@ export function PublicationCalendar() {
             <DialogTitle>{selectedEvent?.title}</DialogTitle>
           </DialogHeader>
           <div className="mt-4 space-y-4">
-            {selectedEvent?.eventType === 'post' ? (
+            {selectedEvent?.eventType === 'calendar' ? (
+              <>
+                <div>
+                  <h4 className="font-medium mb-1">Time</h4>
+                  <p className="text-sm">
+                    {format(selectedEvent.start, 'PPP p')} - {format(selectedEvent.end, 'p')}
+                  </p>
+                </div>
+                {selectedEvent.description && (
+                  <div>
+                    <h4 className="font-medium mb-1">Description</h4>
+                    <p className="text-sm">{selectedEvent.description}</p>
+                  </div>
+                )}
+                {selectedEvent.meetLink && (
+                  <div className="flex items-center gap-2 text-blue-600">
+                    <Video className="h-4 w-4" />
+                    <a
+                      href={selectedEvent.meetLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm hover:underline"
+                    >
+                      Join Google Meet
+                    </a>
+                  </div>
+                )}
+              </>
+            ) : selectedEvent?.eventType === 'post' ? (
               <>
                 <div>
                   <h4 className="font-medium mb-1">Type</h4>

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../auth/[...nextauth]/route';
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 
 
 
@@ -55,6 +55,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Get lead's email if leadId is provided
+    let attendees = [];
+    if (leadId) {
+      const lead = await db.collection('leads').findOne({ _id: new ObjectId(leadId) });
+      if (lead?.email) {
+        attendees.push({ email: lead.email });
+      }
+    }
+
     // Set credentials
     oauth2Client.setCredentials({
       access_token: settings.googleAccessToken,
@@ -62,12 +71,14 @@ export async function POST(request: NextRequest) {
       expiry_date: new Date(settings.googleTokenExpiry).getTime()
     });
 
-    // Create calendar event with optional Google Meet
+    // Create calendar event with optional Google Meet and attendees
     const event = await calendar.events.insert({
       calendarId: 'primary',
+      sendUpdates: 'all', // ✅ Correct placement
+      conferenceDataVersion: createMeet ? 1 : 0, // ✅ Correct
       requestBody: {
         summary: title,
-        description: description,
+        description,
         start: {
           dateTime: new Date(startTime).toISOString(),
           timeZone: 'UTC'
@@ -76,20 +87,22 @@ export async function POST(request: NextRequest) {
           dateTime: new Date(endTime).toISOString(),
           timeZone: 'UTC'
         },
+        attendees,
         conferenceData: createMeet ? {
           createRequest: {
             requestId: Math.random().toString(36).substring(7),
             conferenceSolutionKey: { type: 'hangoutsMeet' }
           }
-        } : undefined
-      },
-      conferenceDataVersion: createMeet ? 1 : 0
+        } : undefined,
+        guestsCanModify: false,
+        guestsCanInviteOthers: false
+      }
     });
 
     // Store event reference in lead's activities
     if (leadId) {
       await db.collection('leads').updateOne(
-        { _id: leadId },
+        { _id: new ObjectId(leadId) },
         {
           $push: {
             activities: {
