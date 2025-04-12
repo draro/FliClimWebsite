@@ -4,24 +4,28 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '../auth/[...nextauth]/route';
 import { MongoClient } from 'mongodb';
 
+
+
+// Initialize OAuth2 client
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
   `${process.env.NEXTAUTH_URL}/api/calendar/callback`
 );
 
-const tasks = google.tasks({ version: 'v1', auth: oauth2Client });
-function formatDateForGoogle(date: Date): string {
-  // Format date to RFC3339 format with UTC timezone
-  return date.toISOString().split('.')[0] + 'Z';
+// Create calendar client
+const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+
+function isValidDate(date: string): boolean {
+  const d = new Date(date);
+  return d instanceof Date && !isNaN(d.getTime());
 }
 
-function isValidDate(date: Date): boolean {
-  return date instanceof Date && !isNaN(date.getTime());
-}
-export async function GET(request: NextRequest) {
+export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
-
+  if (!process.env.MONGODB_URI) {
+    throw new Error('Missing MONGODB_URI');
+  }
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -29,8 +33,18 @@ export async function GET(request: NextRequest) {
   let client;
 
   try {
+    const { leadId, title, description, startTime, endTime, createMeet = false } = await request.json();
+
+    // Validate dates
+    if (!isValidDate(startTime) || !isValidDate(endTime)) {
+      return NextResponse.json(
+        { error: 'Invalid date format' },
+        { status: 400 }
+      );
+    }
+
     // Get stored tokens from MongoDB
-    client = await MongoClient.connect(process.env.MONGODB_URI!);
+    client = await MongoClient.connect(process.env.MONGODB_URI);
     const db = client.db('flyclim');
     const settings = await db.collection('settings').findOne({});
 
@@ -48,31 +62,56 @@ export async function GET(request: NextRequest) {
       expiry_date: new Date(settings.googleTokenExpiry).getTime()
     });
 
-    // Get task lists
-    const taskLists = await tasks.tasklists.list();
+    // Create calendar event with optional Google Meet
+    const event = await calendar.events.insert({
+      calendarId: 'primary',
+      requestBody: {
+        summary: title,
+        description: description,
+        start: {
+          dateTime: new Date(startTime).toISOString(),
+          timeZone: 'UTC'
+        },
+        end: {
+          dateTime: new Date(endTime).toISOString(),
+          timeZone: 'UTC'
+        },
+        conferenceData: createMeet ? {
+          createRequest: {
+            requestId: Math.random().toString(36).substring(7),
+            conferenceSolutionKey: { type: 'hangoutsMeet' }
+          }
+        } : undefined
+      },
+      conferenceDataVersion: createMeet ? 1 : 0
+    });
 
-    // Get tasks from each list
-    const allTasks = [];
-    for (const list of taskLists.data.items || []) {
-      if (!list.id) continue; // ✅ Skip invalid task lists
-
-      const taskResponse = await tasks.tasks.list({
-        tasklist: list.id,
-        showCompleted: true,
-        showHidden: false
-      });
-
-      if (taskResponse.data.items) {
-        allTasks.push(...taskResponse.data.items.map(task => ({
-          ...task,
-          listTitle: list.title
-        })));
-      }
+    // Store event reference in lead's activities
+    if (leadId) {
+      await db.collection('leads').updateOne(
+        { _id: leadId },
+        {
+          $push: {
+            activities: {
+              type: 'calendar_event',
+              note: `Calendar event created: ${title}`,
+              eventId: event.data.id,
+              meetLink: event.data.hangoutLink,
+              timestamp: new Date()
+            }
+          }
+        } as any
+      );
     }
 
-    return NextResponse.json({ tasks: allTasks });
+    return NextResponse.json({
+      success: true,
+      eventId: event.data.id,
+      eventLink: event.data.htmlLink,
+      meetLink: event.data.hangoutLink
+    });
   } catch (error: any) {
-    console.error('Failed to fetch Google tasks:', error);
+    console.error('Failed to create calendar event:', error);
 
     // Check for token expiration
     if (error.code === 401) {
@@ -83,7 +122,7 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: 'Failed to fetch Google tasks' },
+      { error: 'Failed to create calendar event' },
       { status: 500 }
     );
   } finally {
@@ -93,9 +132,11 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
-
+  if (!process.env.MONGODB_URI) {
+    throw new Error('Missing MONGODB_URI');
+  }
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -103,10 +144,8 @@ export async function POST(request: NextRequest) {
   let client;
 
   try {
-    const { title, notes, due, listId } = await request.json();
-
     // Get stored tokens from MongoDB
-    client = await MongoClient.connect(process.env.MONGODB_URI!);
+    client = await MongoClient.connect(process.env.MONGODB_URI);
     const db = client.db('flyclim');
     const settings = await db.collection('settings').findOne({});
 
@@ -124,33 +163,20 @@ export async function POST(request: NextRequest) {
       expiry_date: new Date(settings.googleTokenExpiry).getTime()
     });
 
-    const dueDate = new Date(due);
-
-    if (!isValidDate(dueDate)) {
-      return NextResponse.json(
-        { error: 'Invalid due date format' },
-        { status: 400 }
-      );
-    }
-    const formattedDue = formatDateForGoogle(dueDate);
-    // Create task
-    const task = await tasks.tasks.insert({
-      tasklist: listId,
-      requestBody: {
-        title,
-        notes,
-        due: formattedDue,
-        status: 'needsAction'
-      }
+    // Get upcoming events
+    const response = await calendar.events.list({
+      calendarId: 'primary',
+      timeMin: new Date().toISOString(),
+      maxResults: 10,
+      singleEvents: true,
+      orderBy: 'startTime',
     });
 
-    return NextResponse.json({
-      success: true,
-      taskId: task.data.id
-    });
+    return NextResponse.json({ events: response.data.items });
   } catch (error: any) {
-    console.error('Failed to create Google task:', error);
+    console.error('Failed to fetch calendar events:', error);
 
+    // Check for token expiration
     if (error.code === 401) {
       return NextResponse.json(
         { error: 'Google Calendar token expired. Please reconnect.' },
@@ -159,7 +185,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: 'Failed to create Google task' },
+      { error: 'Failed to fetch calendar events' },
       { status: 500 }
     );
   } finally {
