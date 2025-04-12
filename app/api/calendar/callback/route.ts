@@ -12,7 +12,14 @@ const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_SECRET,
     `${process.env.NEXTAUTH_URL}/api/calendar/callback`
 );
+function formatDateForGoogle(date: Date): string {
+    // Format date to RFC3339 format with UTC timezone
+    return date.toISOString().split('.')[0] + 'Z';
+}
 
+function isValidDate(date: Date): boolean {
+    return date instanceof Date && !isNaN(date.getTime());
+}
 // Create calendar client
 const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
 
@@ -56,11 +63,11 @@ export async function POST(request: NextRequest) {
                 summary: title,
                 description: description,
                 start: {
-                    dateTime: new Date(startTime).toISOString(),
+                    dateTime: formatDateForGoogle(startTime),
                     timeZone: 'UTC'
                 },
                 end: {
-                    dateTime: new Date(endTime).toISOString(),
+                    dateTime: formatDateForGoogle(endTime),
                     timeZone: 'UTC'
                 },
                 conferenceData: createMeet ? {
@@ -120,60 +127,60 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
-  const code = searchParams.get('code');
-  const state = searchParams.get('state');
-  const error = searchParams.get('error');
-  const cookieStore = cookies();
-  const savedState = cookieStore.get('google_state')?.value;
-  let client;
+    const searchParams = request.nextUrl.searchParams;
+    const code = searchParams.get('code');
+    const state = searchParams.get('state');
+    const error = searchParams.get('error');
+    const cookieStore = cookies();
+    const savedState = cookieStore.get('google_state')?.value;
+    let client;
 
-  // Handle errors from Google
-  if (error) {
-    console.error('Google OAuth error:', error);
-    return NextResponse.redirect(new URL('/admin/settings?error=google_auth_failed', request.url));
-  }
-
-  // Validate state to prevent CSRF
-  if (!state || state !== savedState) {
-    return NextResponse.redirect(new URL('/admin/settings?error=invalid_state', request.url));
-  }
-
-  if (!code) {
-    return NextResponse.redirect(new URL('/admin/settings?error=no_code', request.url));
-  }
-
-  try {
-    // Exchange code for tokens
-    const { tokens } = await oauth2Client.getToken(code);
-    
-    // Store tokens in MongoDB
-    client = await MongoClient.connect(process.env.MONGODB_URI!);
-    const db = client.db('flyclim');
-    
-    await db.collection('settings').updateOne(
-      {},
-      {
-        $set: {
-          googleAccessToken: tokens.access_token,
-          googleRefreshToken: tokens.refresh_token,
-          googleTokenExpiry: new Date(Date.now() + (tokens.expiry_date || 3600000)),
-          updatedAt: new Date()
-        }
-      },
-      { upsert: true }
-    );
-
-    // Clear the state cookie
-    cookieStore.delete('google_state');
-
-    return NextResponse.redirect(new URL('/admin/settings?success=true', request.url));
-  } catch (error) {
-    console.error('Google callback error:', error);
-    return NextResponse.redirect(new URL('/admin/settings?error=server_error', request.url));
-  } finally {
-    if (client) {
-      await client.close();
+    // Handle errors from Google
+    if (error) {
+        console.error('Google OAuth error:', error);
+        return NextResponse.redirect(new URL('/admin/settings?error=google_auth_failed', request.url));
     }
-  }
+
+    // Validate state to prevent CSRF
+    if (!state || state !== savedState) {
+        return NextResponse.redirect(new URL('/admin/settings?error=invalid_state', request.url));
+    }
+
+    if (!code) {
+        return NextResponse.redirect(new URL('/admin/settings?error=no_code', request.url));
+    }
+
+    try {
+        // Exchange code for tokens
+        const { tokens } = await oauth2Client.getToken(code);
+
+        // Store tokens in MongoDB
+        client = await MongoClient.connect(process.env.MONGODB_URI!);
+        const db = client.db('flyclim');
+
+        await db.collection('settings').updateOne(
+            {},
+            {
+                $set: {
+                    googleAccessToken: tokens.access_token,
+                    googleRefreshToken: tokens.refresh_token,
+                    googleTokenExpiry: new Date(Date.now() + (tokens.expiry_date || 3600000)),
+                    updatedAt: new Date()
+                }
+            },
+            { upsert: true }
+        );
+
+        // Clear the state cookie
+        cookieStore.delete('google_state');
+
+        return NextResponse.redirect(new URL('/admin/settings?success=true', request.url));
+    } catch (error) {
+        console.error('Google callback error:', error);
+        return NextResponse.redirect(new URL('/admin/settings?error=server_error', request.url));
+    } finally {
+        if (client) {
+            await client.close();
+        }
+    }
 }

@@ -11,7 +11,14 @@ const oauth2Client = new google.auth.OAuth2(
 );
 
 const tasks = google.tasks({ version: 'v1', auth: oauth2Client });
+function formatDateForGoogle(date: Date): string {
+  // Format date to RFC3339 format with UTC timezone
+  return date.toISOString().split('.')[0] + 'Z';
+}
 
+function isValidDate(date: Date): boolean {
+  return date instanceof Date && !isNaN(date.getTime());
+}
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!process.env.MONGODB_URI) {
@@ -125,7 +132,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Format date to RFC3339 format
-    const formattedDue = dueDate.toISOString();
+    const formattedDue = formatDateForGoogle(dueDate);
 
     // Get stored tokens from MongoDB
     client = await MongoClient.connect(process.env.MONGODB_URI!);
