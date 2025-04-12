@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
 
     // Parse and validate the due date
     const dueDate = new Date(due);
-    if (isNaN(dueDate.getTime())) {
+    if (!isValidDate(dueDate)) {
       return NextResponse.json(
         { error: 'Invalid due date format' },
         { status: 400 }
