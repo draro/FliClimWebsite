@@ -11,7 +11,14 @@ const oauth2Client = new google.auth.OAuth2(
 );
 
 const tasks = google.tasks({ version: 'v1', auth: oauth2Client });
+function formatDateForGoogle(date: Date): string {
+  // Format date to RFC3339 format with UTC timezone
+  return date.toISOString().split('.')[0] + 'Z';
+}
 
+function isValidDate(date: Date): boolean {
+  return date instanceof Date && !isNaN(date.getTime());
+}
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
 
@@ -117,13 +124,22 @@ export async function POST(request: NextRequest) {
       expiry_date: new Date(settings.googleTokenExpiry).getTime()
     });
 
+    const dueDate = new Date(due);
+
+    if (!isValidDate(dueDate)) {
+      return NextResponse.json(
+        { error: 'Invalid due date format' },
+        { status: 400 }
+      );
+    }
+    const formattedDue = formatDateForGoogle(dueDate);
     // Create task
     const task = await tasks.tasks.insert({
       tasklist: listId,
       requestBody: {
         title,
         notes,
-        due: new Date(due).toISOString(),
+        due: formattedDue,
         status: 'needsAction'
       }
     });
