@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 
 export const metadata: Metadata = {
     title: 'Live Demo',
@@ -24,5 +25,17 @@ export default function DemoLayout({
 }: {
     children: React.ReactNode;
 }) {
-    return children;
+    return (
+        <>
+            <Script
+                src="https://cesium.com/downloads/cesiumjs/releases/1.113/Build/Cesium/Cesium.js"
+                strategy="afterInteractive"
+            />
+            <link
+                href="https://cesium.com/downloads/cesiumjs/releases/1.113/Build/Cesium/Widgets/widgets.css"
+                rel="stylesheet"
+            />
+            {children}
+        </>
+    );
 }

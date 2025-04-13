@@ -225,33 +225,87 @@ export function FPLForm({ onVisualize, onLoad, initialFPL, onClose }: FPLFormPro
       setOpenAirportSelect(false)
     };
   }
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   // try {
+  //   //         const response = await fetch('/api/flights', {
+  //   //           method:"Post"
+  //   //         });
+  //   //         if (!response.ok) throw new Error('Failed to fetch flights');
+  //   //         const data = await response.json();
+  //   //         setFlights(data.flights);
+  //   //     } catch (error) {
+  //   //         console.error('Failed to fetch flights:', error);
+  //   //         toast({
+  //   //             title: 'Error',
+  //   //             description: 'Failed to fetch flights',
+  //   //             variant: 'destructive'
+  //   //         });
+  //   //     } finally {
+  //   //         setIsLoading(false);
+  //   //     }
+  //   // setIsSubmitting(true);
+  //   // onLoad();
+
+  //   try {
+  //     // Format the date and time
+  //     const dateTime = new Date(`${formData.date}T${formData.etd}`);
+
+  //     // Generate flight plan
+  //     const response = await fetch('https://demo.flyclim.com/api/create-fpl', {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({
+  //         flightNumber: formData.flightNumber,
+  //         aircraft: formData.aircraft,
+  //         speed: parseInt(formData.speed),
+  //         altitude: parseInt(formData.altitude),
+  //         fuel: parseFloat(formData.fuel),
+  //         adep: formData.departure,
+  //         ades: formData.destination,
+  //         dep_time: dateTime.toISOString()
+  //       })
+  //     });
+
+  //     if (!response.ok) throw new Error('Failed to generate flight plan');
+  //     const data = await response.json();
+
+  //     // Extract route from generated FPL
+  //     const route = extractRouteFromFPL(data.fpl);
+  //     if (!route) throw new Error('Failed to parse flight plan');
+
+  //     // Get route visualization
+  //     const routeResponse = await fetch('https://demo.flyclim.com/api/route', {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({ fpl: data.fpl })
+  //     });
+
+  //     if (!routeResponse.ok) throw new Error('Failed to visualize route');
+  //     const routeData = await routeResponse.json();
+
+  //     onVisualize?.(routeData, data.fpl);
+  //     setShowRoutes(true);
+  //   } catch (error) {
+  //     console.error('FPL submission error:', error);
+  //     toast({
+  //       title: 'Error',
+  //       description: 'Failed to generate flight plan. Please try again.',
+  //       variant: 'destructive'
+  //     });
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // try {
-    //         const response = await fetch('/api/flights', {
-    //           method:"Post"
-    //         });
-    //         if (!response.ok) throw new Error('Failed to fetch flights');
-    //         const data = await response.json();
-    //         setFlights(data.flights);
-    //     } catch (error) {
-    //         console.error('Failed to fetch flights:', error);
-    //         toast({
-    //             title: 'Error',
-    //             description: 'Failed to fetch flights',
-    //             variant: 'destructive'
-    //         });
-    //     } finally {
-    //         setIsLoading(false);
-    //     }
-    // setIsSubmitting(true);
+    setIsSubmitting(true);
     // onLoad();
 
     try {
-      // Format the date and time
       const dateTime = new Date(`${formData.date}T${formData.etd}`);
 
-      // Generate flight plan
       const response = await fetch('https://demo.flyclim.com/api/create-fpl', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -270,11 +324,6 @@ export function FPLForm({ onVisualize, onLoad, initialFPL, onClose }: FPLFormPro
       if (!response.ok) throw new Error('Failed to generate flight plan');
       const data = await response.json();
 
-      // Extract route from generated FPL
-      const route = extractRouteFromFPL(data.fpl);
-      if (!route) throw new Error('Failed to parse flight plan');
-
-      // Get route visualization
       const routeResponse = await fetch('https://demo.flyclim.com/api/route', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -284,7 +333,20 @@ export function FPLForm({ onVisualize, onLoad, initialFPL, onClose }: FPLFormPro
       if (!routeResponse.ok) throw new Error('Failed to visualize route');
       const routeData = await routeResponse.json();
 
-      onVisualize?.(routeData, data.fpl);
+      const storeResponse = await fetch('/api/flights', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fpl: data.fpl,
+          routeData
+        })
+      });
+
+      if (!storeResponse.ok) {
+        console.error('Failed to store flight data');
+      }
+
+      onVisualize(routeData, data.fpl);
       setShowRoutes(true);
     } catch (error) {
       console.error('FPL submission error:', error);

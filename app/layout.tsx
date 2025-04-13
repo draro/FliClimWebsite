@@ -91,14 +91,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <Script
-          src="https://cesium.com/downloads/cesiumjs/releases/1.113/Build/Cesium/Cesium.js"
-          strategy="afterInteractive"
-        />
-        <link
-          href="https://cesium.com/downloads/cesiumjs/releases/1.113/Build/Cesium/Widgets/widgets.css"
-          rel="stylesheet"
-        />
+
         {/* Google Tag Manager */}
         <Script id="google-tag-manager" strategy="afterInteractive">
           {`

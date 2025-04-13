@@ -33,6 +33,7 @@ export function FlightPlanList({ onViewFlight, onAddFlight, risk_factors }: Flig
     const [flights, setFlights] = useState<Flight[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [showFPLForm, setShowFPLForm] = useState(false);
+    const [showFlightData, setShowFlightData] = useState<string | null>(null);
     const { toast } = useToast();
 
     useEffect(() => {
@@ -165,6 +166,14 @@ export function FlightPlanList({ onViewFlight, onAddFlight, risk_factors }: Flig
                                     <Eye className="h-4 w-4 mr-2" />
                                     View Route
                                 </Button>
+                                <Button
+                                    variant="outline"
+                                    onClick={() => setShowFlightData(flight.fpl)}
+                                    className="ml-4"
+                                >
+                                    <Eye className="h-4 w-4 mr-2" />
+                                    Show Flight
+                                </Button>
                             </div>
                         </Card>
                     ))}
@@ -176,13 +185,28 @@ export function FlightPlanList({ onViewFlight, onAddFlight, risk_factors }: Flig
                     )}
                 </div>
             )}
-            {showFPLForm &&
+            {showFlightData && (
+                <Dialog open={Boolean(showFlightData)} onOpenChange={() => setShowFlightData(null)}>
+                    <DialogContent className='max-w-3xl'>
+                        <div className="flex items-center justify-between bg-gray-100 p-4 rounded-md">
+                            <div className="flex items-center gap-2">
+                                <AlertTriangle className="h-4 w-4 text-red-600" />
+                                <pre className="text-sm font-medium">{showFlightData}</pre>
+                            </div>
+                        
+                        </div>
+                    </DialogContent>
+                </Dialog>
+            )
+            }
+            {
+                showFPLForm &&
                 <Dialog open={showFPLForm} onOpenChange={setShowFPLForm}>
                     <DialogContent className='max-w-3xl'>
                         <FPLForm onClose={() => setShowFPLForm(false)} onVisualize={fetchFlights} />
                     </DialogContent>
                 </Dialog>
             }
-        </div>
+        </div >
     );
 }
