@@ -5,7 +5,9 @@ import { Footer } from '@/components/Footer';
 
 export const metadata: Metadata = {
   title: 'Our Solutions',
-  description: 'Discover how FlyClim\'s AI-powered solutions help prevent flight delays and optimize routes.',
+  description: 'Discover how FlyClim\'s AI-powered solutions help prevent flight delays and optimize routes.', alternates: {
+    canonical: `https://www.flyclim.com/solutions`,
+  },
   openGraph: {
     title: 'FlyClim Solutions - AI-Powered Flight Optimization',
     description: 'Discover how FlyClim\'s AI-powered solutions help prevent flight delays and optimize routes.',

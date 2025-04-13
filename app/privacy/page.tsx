@@ -6,6 +6,9 @@ import { Privacy } from '@/components/Privacy';
 export const metadata: Metadata = {
   title: 'Privacy Policy',
   description: 'FlyClim privacy policy and data protection information.',
+  alternates: {
+    canonical: `https://www.flyclim.com/privacy`,
+  },
 };
 
 export default function PrivacyPage() {

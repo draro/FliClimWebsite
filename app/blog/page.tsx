@@ -6,6 +6,9 @@ import { Footer } from '@/components/Footer';
 export const metadata: Metadata = {
   title: 'Blog',
   description: 'Latest insights and updates from FlyClim on aviation weather optimization and flight planning.',
+  alternates: {
+    canonical: `https://www.flyclim.com/blog`,
+  },
   openGraph: {
     title: 'FlyClim Blog - Aviation Weather Insights',
     description: 'Latest insights and updates from FlyClim on aviation weather optimization and flight planning.',

@@ -6,6 +6,9 @@ import { Footer } from '@/components/Footer';
 export const metadata: Metadata = {
   title: 'Pilot Program',
   description: 'Join FlyClim\'s pilot program and be among the first to experience our revolutionary weather optimization technology.',
+  alternates: {
+    canonical: `https://www.flyclim.com/pilot-program`,
+  },
   openGraph: {
     title: 'FlyClim Pilot Program - Early Access',
     description: 'Join FlyClim\'s pilot program and be among the first to experience our revolutionary weather optimization technology.',

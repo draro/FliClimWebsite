@@ -6,6 +6,9 @@ import { Footer } from '@/components/Footer';
 export const metadata: Metadata = {
   title: 'Contact Us',
   description: 'Get in touch with FlyClim for inquiries about our aviation weather optimization solutions.',
+  alternates: {
+    canonical: `https://www.flyclim.com/contact`,
+  },
   openGraph: {
     title: 'Contact FlyClim - Aviation Weather Solutions',
     description: 'Get in touch with FlyClim for inquiries about our aviation weather optimization solutions.',

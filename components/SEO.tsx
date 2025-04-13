@@ -19,7 +19,7 @@ export function SEO({
     twitterCard = 'summary_large_image'
 }: SEOProps) {
     const pathname = usePathname();
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://flyclim.com';
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://flyclim.com';
     const canonicalUrl = `${baseUrl}${pathname}`;
     const ogImageUrl = ogImage.startsWith('http') ? ogImage : `${baseUrl}${ogImage}`;
 

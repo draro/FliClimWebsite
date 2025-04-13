@@ -6,6 +6,9 @@ import { Terms } from '@/components/Terms';
 export const metadata: Metadata = {
   title: 'Terms and Conditions',
   description: 'FlyClim terms and conditions of service.',
+  alternates: {
+    canonical: `https://www.flyclim.com/terms`,
+  },
 };
 
 export default function TermsPage() {

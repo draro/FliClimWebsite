@@ -12,6 +12,9 @@ export const metadata: Metadata = {
     default: 'FlyClim Storm Viewer | AI-Powered Weather Optimization',
     template: '%s | FlyClim Storm Viewer'
   },
+  alternates: {
+    canonical: `https://www.flyclim.com`,
+  },
   description: 'FlyClim helps airlines reduce costly weather-related delays with predictive routing intelligence—saving time, fuel, and operational costs.',
   keywords: ['aviation weather', 'flight planning', 'storm tracking', 'airline operations', 'weather optimization', 'flight delay prevention'],
   authors: [{ name: 'FlyClim' }],
