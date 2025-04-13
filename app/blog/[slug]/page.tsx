@@ -8,6 +8,7 @@ import { format } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SocialShare } from '@/components/SocialShare';
 import { MarkdownRenderer } from '@/components/MarkdownRenderer';
+import { SEO } from '@/components/SEO';
 import Image from 'next/image';
 
 interface Post {
@@ -85,12 +86,18 @@ export default function BlogPostPage() {
     );
   }
 
-  const currentUrl = typeof window !== 'undefined' 
-    ? window.location.href 
+  const currentUrl = typeof window !== 'undefined'
+    ? window.location.href
     : `https://flyclim.com/blog/${slug}`;
 
   return (
     <main className="min-h-screen">
+      <SEO
+        title={post.title}
+        description={post.excerpt}
+        ogImage={post.featuredImage || '/logo.png'}
+        ogType="article"
+      />
       <Navigation />
       <article>
         {post.featuredImage && (

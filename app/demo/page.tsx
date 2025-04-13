@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { ArrowLeft, Home, Map, PlaneTakeoff } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { SEO } from '@/components/SEO';
 
 const CesiumViewer = dynamic(
   () => import('@/components/CesiumViewer'),
@@ -36,6 +37,10 @@ export default function DemoPage() {
 
   return (
     <div className="relative h-screen flex">
+      <SEO
+        title="FlyClim Demo - Interactive Flight Planning"
+        description="Try our interactive flight planning and weather optimization demo. Experience real-time route visualization and storm tracking."
+      />
       {/* Navigation Drawer */}
       <div className={cn(
         "h-screen bg-white border-r transition-all duration-300 flex flex-col",
