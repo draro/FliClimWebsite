@@ -14,13 +14,13 @@ interface DemoContactFormProps {
     onSubmit: () => void;
 }
 declare global {
-  interface Window {
-    hbspt?: {
-      forms: {
-        submit: (formId: string, data: any) => void;
-      };
-    };
-  }
+    interface Window {
+        hbspt?: {
+            forms: {
+                submit: (formId: string, data: any) => void;
+            };
+        };
+    }
 }
 export function DemoContactForm({ onSubmit }: DemoContactFormProps) {
     const { toast } = useToast();
@@ -97,9 +97,9 @@ export function DemoContactForm({ onSubmit }: DemoContactFormProps) {
                 })
             });
 
-            if (!response.ok) {
-                throw new Error('Failed to create lead');
-            }
+            // if (!response.ok) {
+            //     throw new Error('Failed to create lead');
+            // }
 
             // Submit to HubSpot
             if (window.hbspt) {

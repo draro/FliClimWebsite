@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -30,7 +30,16 @@ export default function DemoPage() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
   const [activeMenuItem, setActiveMenuItem] = useState<MenuItem>('map');
   const [showContactForm, setShowContactForm] = useState(true);
-
+  useEffect(() => {
+    const hasSubmittedForm = localStorage.getItem('hasSubmittedForm');
+    if (hasSubmittedForm) {
+      setShowContactForm(false);
+    }
+  }, []);
+  const handleFormSubmit = () => {
+    localStorage.setItem('hasSubmittedForm', 'true');
+    setShowContactForm(false);
+  };
   const menuItems = [
     { id: 'map', label: 'Interactive Map', icon: Map, href: '/demo' },
     { id: 'flights', label: 'Flight Plans', icon: PlaneTakeoff, href: '/demo/flights' }
@@ -112,7 +121,7 @@ export default function DemoPage() {
         {showContactForm && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/50">
             <div className="max-w-xl w-full mx-4">
-              <DemoContactForm onSubmit={() => setShowContactForm(false)} />
+              <DemoContactForm onSubmit={handleFormSubmit} />
             </div>
           </div>
         )}
