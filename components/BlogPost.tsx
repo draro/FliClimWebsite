@@ -67,7 +67,7 @@ export function BlogPost({ slug }: BlogPostProps) {
         );
     }
 
-    if (!post) {
+    if (!post && !isLoading) {
         return (
             <div className="pt-24 pb-16">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -83,7 +83,7 @@ export function BlogPost({ slug }: BlogPostProps) {
 
     return (
         <article>
-            {post.featuredImage && (
+            {post?.featuredImage && (
                 <div className="relative w-full h-[400px] pt-16">
                     <Image
                         src={post.featuredImage}
@@ -95,20 +95,20 @@ export function BlogPost({ slug }: BlogPostProps) {
                     <div className="absolute inset-0 bg-black/25" />
                 </div>
             )}
-            <div className={`max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 ${post.featuredImage ? '-mt-32 relative z-10' : 'pt-24'} pb-16`}>
-                <div className={`${post.featuredImage ? 'bg-white p-8 rounded-lg shadow-xl' : ''}`}>
-                    <h1 className="text-4xl font-bold mb-4">{post.title}</h1>
+            <div className={`max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 ${post?.featuredImage ? '-mt-32 relative z-10' : 'pt-24'} pb-16`}>
+                <div className={`${post?.featuredImage ? 'bg-white p-8 rounded-lg shadow-xl' : ''}`}>
+                    <h1 className="text-4xl font-bold mb-4">{post?.title}</h1>
                     <div className="flex items-center justify-between mb-8">
                         <p className="text-gray-600">
-                            {format(new Date(post.publishedAt), 'MMMM d, yyyy')}
+                            {post?.publishedAt ? format(new Date(post?.publishedAt), 'MMMM d, yyyy') : "Jan 1, 2025"}
                         </p>
                         <SocialShare
                             url={currentUrl}
-                            title={post.title}
-                            summary={post.excerpt}
+                            title={post?.title ? post.title : "FlyClim Blog Post"}
+                            summary={post?.excerpt ? post?.excerpt : "This is a summary of the blog post."}
                         />
                     </div>
-                    <MarkdownRenderer content={post.content} />
+                    <MarkdownRenderer content={post?.content ? post?.content : ""} />
                 </div>
             </div>
         </article>

@@ -9,8 +9,8 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: {
-    default: 'FlyClim Storm Viewer | AI-Powered Weather Optimization',
-    template: '%s | FlyClim Storm Viewer'
+    default: 'FlyClim | AI-Powered Weather Optimization',
+    template: '%s | FlyClim'
   },
   alternates: {
     canonical: `https://www.flyclim.com`,
@@ -35,21 +35,21 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: new URL('https://www.flyclim.com'),
-    siteName: 'FlyClim Storm Viewer',
-    title: 'FlyClim Storm Viewer | AI-Powered Weather Optimization',
+    siteName: 'FlyClim',
+    title: 'FlyClim | AI-Powered Weather Optimization',
     description: 'FlyClim helps airlines reduce costly weather-related delays with predictive routing intelligence—saving time, fuel, and operational costs.',
     images: [
       {
         url: '/logo.png',
         width: 1200,
         height: 630,
-        alt: 'FlyClim Storm Viewer',
+        alt: 'FlyClim',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'FlyClim Storm Viewer | AI-Powered Weather Optimization',
+    title: 'FlyClim | AI-Powered Weather Optimization',
     description: 'FlyClim helps airlines reduce costly weather-related delays with predictive routing intelligence—saving time, fuel, and operational costs.',
     images: ['/logo.png'],
     creator: '@flyclim',

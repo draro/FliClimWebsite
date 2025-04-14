@@ -346,7 +346,7 @@ export function FPLForm({ onVisualize, onLoad, initialFPL, onClose }: FPLFormPro
         console.error('Failed to store flight data');
       }
 
-      onVisualize(routeData, data.fpl);
+      onVisualize?.(routeData, data.fpl);
       setShowRoutes(true);
     } catch (error) {
       console.error('FPL submission error:', error);

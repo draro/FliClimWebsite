@@ -188,12 +188,11 @@ export function FlightPlanList({ onViewFlight, onAddFlight, risk_factors }: Flig
             {showFlightData && (
                 <Dialog open={Boolean(showFlightData)} onOpenChange={() => setShowFlightData(null)}>
                     <DialogContent className='max-w-3xl'>
-                        <div className="flex items-center justify-between bg-gray-100 p-4 rounded-md">
-                            <div className="flex items-center gap-2">
-                                <AlertTriangle className="h-4 w-4 text-red-600" />
-                                <pre className="text-sm font-medium">{showFlightData}</pre>
+                        <div className="flex items-center justify-between bg-gray-100 p-4 rounded-md ">
+                            <div className="flex items-center gap-2 flex-wrap w-full">
+                                {/* <AlertTriangle className="h-4 w-4 text-red-600" /> */}
+                                <pre className="text-sm font-medium ">{showFlightData}</pre>
                             </div>
-                        
                         </div>
                     </DialogContent>
                 </Dialog>

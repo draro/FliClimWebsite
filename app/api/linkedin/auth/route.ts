@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     linkedinAuthUrl.searchParams.append('client_id', process.env.LINKEDIN_CLIENT_ID || "");
     linkedinAuthUrl.searchParams.append('redirect_uri', `${process.env.NEXTAUTH_URL}/api/linkedin/callback`);
     linkedinAuthUrl.searchParams.append('state', state);
-    linkedinAuthUrl.searchParams.append('scope', 'w_member_social ');
+    linkedinAuthUrl.searchParams.append('scope', 'w_member_social email profile openid');
 
     return NextResponse.redirect(linkedinAuthUrl);
 }

@@ -113,7 +113,7 @@ export default function CesiumViewer() {
     viewer.clock.multiplier = 30;
 
     window.Cesium.Model.fromGltfAsync({
-      url: '/models/Cesium_Air.glb',
+      url: '/models/ELAL.glb',
       scale: 1.0
     }).catch((error: any) => {
       console.warn('Failed to preload aircraft model:', error);
@@ -515,7 +515,7 @@ export default function CesiumViewer() {
           position: property,
           orientation: new window.Cesium.VelocityOrientationProperty(property),
           model: {
-            uri: '/models/Cesium_Air.glb',
+            uri: '/models/ELAL.glb',
             minimumPixelSize: 64,
             maximumScale: 10000
           },

@@ -3,13 +3,13 @@ import { MongoClient } from 'mongodb';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../auth/[...nextauth]/route';
 
-if (!process.env.MONGODB_URI) {
-  throw new Error('Invalid/Missing environment variable: "MONGODB_URI"');
-}
+
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
-  
+  if (!process.env.MONGODB_URI) {
+    throw new Error('Invalid/Missing environment variable: "MONGODB_URI"');
+  }
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -17,9 +17,22 @@ export async function GET(request: NextRequest) {
   let client;
 
   try {
-    client = await MongoClient.connect(process.env.MONGODB_URI as string);
+    client = await MongoClient.connect(process.env.MONGODB_URI);
     const db = client.db('flyclim');
-    const settings = await db.collection('settings').findOne({});
+
+    // Only return necessary settings
+    const settings = await db.collection('settings').findOne(
+      {},
+      {
+        projection: {
+          linkedinAccessToken: 1,
+          linkedinTokenExpiry: 1,
+          linkedinOrganizationId: 1,
+          googleAccessToken: 1,
+          googleTokenExpiry: 1
+        }
+      }
+    );
 
     return NextResponse.json(settings || {});
   } catch (error) {
@@ -37,7 +50,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
-  
+  if (!process.env.MONGODB_URI) {
+    throw new Error('Invalid/Missing environment variable: "MONGODB_URI"');
+  }
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -46,19 +61,53 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    client = await MongoClient.connect(process.env.MONGODB_URI as string);
+
+    // Validate organization ID if provided
+    if (body.linkedinOrganizationId && !/^\d+$/.test(body.linkedinOrganizationId)) {
+      return NextResponse.json(
+        { error: 'Invalid LinkedIn Organization ID format' },
+        { status: 400 }
+      );
+    }
+
+    client = await MongoClient.connect(process.env.MONGODB_URI);
     const db = client.db('flyclim');
-    
+
+    // Only update allowed fields
+    const allowedFields = [
+      'linkedinOrganizationId',
+      'linkedinAccessToken',
+      'linkedinTokenExpiry',
+      'googleAccessToken',
+      'googleTokenExpiry',
+      'googleRefreshToken'
+    ];
+
+    const updateData = Object.keys(body)
+      .filter(key => allowedFields.includes(key))
+      .reduce((obj, key) => ({
+        ...obj,
+        [key]: body[key]
+      }), {});
+
     await db.collection('settings').updateOne(
-        { _id: body._id },
-      { $set: { ...body, updatedAt: new Date() } },
+      {},
+      {
+        $set: {
+          ...updateData,
+          updatedAt: new Date()
+        }
+      },
       { upsert: true }
     );
 
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Failed to update settings:', error);
-    return NextResponse.json({ error: 'Failed to update settings' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to update settings' },
+      { status: 500 }
+    );
   } finally {
     if (client) {
       await client.close();

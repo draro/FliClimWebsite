@@ -20,14 +20,14 @@ export async function POST(request: NextRequest) {
 
   try {
 
-    // Get LinkedIn access token from MongoDB
+    // Get LinkedIn tokens from MongoDB
     client = await MongoClient.connect(process.env.MONGODB_URI);
     const db = client.db('flyclim');
     const settings = await db.collection('settings').findOne({});
 
     if (!settings?.linkedinAccessToken || !settings?.linkedinMemberId) {
       return NextResponse.json(
-        { error: 'LinkedIn not connected' },
+        { error: 'LinkedIn not connected or organization ID not set' },
         { status: 401 }
       );
     }
@@ -50,6 +50,7 @@ export async function POST(request: NextRequest) {
         'Authorization': `Bearer ${settings.linkedinAccessToken}`,
         'Content-Type': 'application/json',
         'X-Restli-Protocol-Version': '2.0.0',
+        'LinkedIn-Version': '202401'
       },
       body: JSON.stringify({
         author: `urn:li:person:${settings.linkedinMemberId}`,
@@ -57,7 +58,7 @@ export async function POST(request: NextRequest) {
         specificContent: {
           'com.linkedin.ugc.ShareContent': {
             shareCommentary: {
-              text: `${title}\n\n${cleanContent}\n\nRead more: ${url}`
+              text: `${title}\n\n${cleanContent}\n\n@FlyClim\n\nRead more: ${url}`
             },
             shareMediaCategory: 'ARTICLE',
             media: [{
@@ -100,7 +101,8 @@ export async function POST(request: NextRequest) {
       title,
       url,
       sharedAt: new Date(),
-      status: 'success'
+      status: 'success',
+      organizationId: settings.linkedinMemberId
     });
 
     return NextResponse.json({
