@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { ArrowLeft, Home, Map, PlaneTakeoff } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { SEO } from '@/components/SEO';
+import { DemoContactForm } from '@/components/DemoContactForm';
 
 const CesiumViewer = dynamic(
   () => import('@/components/CesiumViewer'),
@@ -29,6 +29,7 @@ type MenuItem = 'map' | 'flights';
 export default function DemoPage() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
   const [activeMenuItem, setActiveMenuItem] = useState<MenuItem>('map');
+  const [showContactForm, setShowContactForm] = useState(true);
 
   const menuItems = [
     { id: 'map', label: 'Interactive Map', icon: Map, href: '/demo' },
@@ -37,10 +38,6 @@ export default function DemoPage() {
 
   return (
     <div className="relative h-screen flex">
-      <SEO
-        title="FlyClim Demo - Interactive Flight Planning"
-        description="Try our interactive flight planning and weather optimization demo. Experience real-time route visualization and storm tracking."
-      />
       {/* Navigation Drawer */}
       <div className={cn(
         "h-screen bg-white border-r transition-all duration-300 flex flex-col",
@@ -108,8 +105,17 @@ export default function DemoPage() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1">
+      <div className="flex-1 relative">
         <CesiumViewer />
+
+        {/* Contact Form Overlay */}
+        {showContactForm && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+            <div className="max-w-xl w-full mx-4">
+              <DemoContactForm onSubmit={() => setShowContactForm(false)} />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
