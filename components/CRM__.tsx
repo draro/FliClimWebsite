@@ -21,10 +21,9 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import { format } from 'date-fns';
-import { UserPlus, Mail, Phone, Linkedin, MessageSquarePlus, Pencil, Calendar, Trash2 } from 'lucide-react';
+import { UserPlus, Mail, Phone, Linkedin, MessageSquarePlus, Pencil, Calendar } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { TaskList } from '@/components/TaskList';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -54,7 +53,6 @@ export function CRM() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [showActivityDialog, setShowActivityDialog] = useState(false);
   const [showCalendarDialog, setShowCalendarDialog] = useState(false);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [newNote, setNewNote] = useState('');
   const [isEditing, setIsEditing] = useState(false);
@@ -97,42 +95,9 @@ export function CRM() {
     }
   };
 
-  const handleDelete = async (lead: Lead) => {
-    setSelectedLead(lead);
-    setShowDeleteDialog(true);
-  };
-
-  const confirmDelete = async () => {
-    if (!selectedLead) return;
-
-    try {
-      const response = await fetch(`/api/leads/${selectedLead._id}`, {
-        method: 'DELETE'
-      });
-
-      if (!response.ok) throw new Error('Failed to delete lead');
-
-      toast({
-        title: 'Success',
-        description: 'Lead deleted successfully'
-      });
-
-      setShowDeleteDialog(false);
-      setSelectedLead(null);
-      fetchLeads();
-    } catch (error) {
-      console.error('Failed to delete lead:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to delete lead',
-        variant: 'destructive'
-      });
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       const response = await fetch('/api/leads', {
         method: isEditing ? 'PUT' : 'POST',
@@ -549,13 +514,6 @@ export function CRM() {
                     >
                       <Calendar className="h-4 w-4" />
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => handleDelete(lead)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
                   </div>
                 </TableCell>
               </TableRow>
@@ -677,7 +635,7 @@ export function CRM() {
               <Checkbox
                 id="createMeet"
                 checked={calendarEvent.createMeet}
-                onCheckedChange={(checked) => 
+                onCheckedChange={(checked) =>
                   setCalendarEvent(prev => ({ ...prev, createMeet: checked as boolean }))
                 }
               />
@@ -695,32 +653,6 @@ export function CRM() {
               </Button>
             </div>
           </form>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Lead</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete {selectedLead?.name}? This action cannot be undone.
-              All associated tasks and activities will also be deleted.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowDeleteDialog(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={confirmDelete}
-            >
-              Delete
-            </Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

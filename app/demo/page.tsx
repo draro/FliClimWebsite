@@ -4,10 +4,11 @@ import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ArrowLeft, Home, Map, PlaneTakeoff } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, Home, Map, PlaneTakeoff } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { DemoContactForm } from '@/components/DemoContactForm';
+import { AirportRisk } from '@/components/AirportRisk';
 
 const CesiumViewer = dynamic(
   () => import('@/components/CesiumViewer'),
@@ -24,12 +25,16 @@ const CesiumViewer = dynamic(
   }
 );
 
-type MenuItem = 'map' | 'flights';
-
+type MenuItem = 'map' | 'flights' | 'airports';
 export default function DemoPage() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
   const [activeMenuItem, setActiveMenuItem] = useState<MenuItem>('map');
   const [showContactForm, setShowContactForm] = useState(true);
+  const menuItems = [
+    { id: 'map', label: 'Interactive Map', icon: Map, href: '/demo' },
+    { id: 'flights', label: 'Flight Plans', icon: PlaneTakeoff, href: '/demo/flights' },
+    { id: 'airports', label: 'Airport Risk', icon: AlertTriangle, href: '#' }
+  ];
   useEffect(() => {
     const hasSubmittedForm = localStorage.getItem('hasSubmittedForm');
     if (hasSubmittedForm) {
@@ -40,10 +45,16 @@ export default function DemoPage() {
     localStorage.setItem('hasSubmittedForm', 'true');
     setShowContactForm(false);
   };
-  const menuItems = [
-    { id: 'map', label: 'Interactive Map', icon: Map, href: '/demo' },
-    { id: 'flights', label: 'Flight Plans', icon: PlaneTakeoff, href: '/demo/flights' }
-  ];
+
+
+
+  const handleMenuClick = (menuId: MenuItem, e: React.MouseEvent) => {
+    if (menuId === 'airports') {
+      e.preventDefault();
+      setActiveMenuItem(menuId);
+    }
+  };
+
 
   return (
     <div className="relative h-screen flex">
@@ -115,8 +126,11 @@ export default function DemoPage() {
 
       {/* Main Content */}
       <div className="flex-1 relative">
-        <CesiumViewer />
+        {/* <CesiumViewer /> */}
+        {activeMenuItem === 'map' && <CesiumViewer />}
+        {activeMenuItem === 'airports' && <AirportRisk />}
 
+        {/* Contact Form Overlay */}
         {/* Contact Form Overlay */}
         {showContactForm && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/50">

@@ -12,10 +12,11 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { format } from 'date-fns';
-import { Clock, Plus } from 'lucide-react';
+import { Clock, Plus, Trash2 } from 'lucide-react';
 import type { TaskStatus } from '@/app/api/tasks/route';
 
 interface Task {
@@ -55,6 +56,8 @@ export function TaskList({ leadId, showInCalendar }: TaskListProps) {
   const { toast } = useToast();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [formData, setFormData] = useState({
     title: '',
@@ -150,6 +153,39 @@ export function TaskList({ leadId, showInCalendar }: TaskListProps) {
       toast({
         title: 'Error',
         description: 'Failed to update task status',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleDelete = async (task: Task) => {
+    setSelectedTask(task);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!selectedTask) return;
+
+    try {
+      const response = await fetch(`/api/tasks/${selectedTask._id}`, {
+        method: 'DELETE'
+      });
+
+      if (!response.ok) throw new Error('Failed to delete task');
+
+      toast({
+        title: 'Success',
+        description: 'Task deleted successfully'
+      });
+
+      setShowDeleteDialog(false);
+      setSelectedTask(null);
+      fetchTasks();
+    } catch (error) {
+      console.error('Failed to delete task:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to delete task',
         variant: 'destructive'
       });
     }
@@ -274,16 +310,49 @@ export function TaskList({ leadId, showInCalendar }: TaskListProps) {
                   </Select>
                 </div>
               </div>
+              <Button
+                variant="destructive"
+                size="sm"
+                className="ml-4"
+                onClick={() => handleDelete(task)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
             </div>
           </Card>
         ))}
 
         {!isLoading && tasks.length === 0 && (
           <div className="text-center py-8 text-gray-500">
-            No tasks found. Click &quot;Add Task&quot; to create one.
+            No tasks found. Click "Add Task" to create one.
           </div>
         )}
       </div>
+
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Task</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this task? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteDialog(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDelete}
+            >
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

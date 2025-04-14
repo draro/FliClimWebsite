@@ -6,6 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { SocialShare } from '@/components/SocialShare';
 import { MarkdownRenderer } from '@/components/MarkdownRenderer';
 import Image from 'next/image';
+import { BlogPostJsonLd } from './JsonLd';
 
 interface Post {
     _id: string;
@@ -83,6 +84,14 @@ export function BlogPost({ slug }: BlogPostProps) {
 
     return (
         <article>
+            <BlogPostJsonLd
+                title={post?.title ? post.title : "FlyClim Blog Post"}
+                description={post?.excerpt ? post?.excerpt : "This is a summary of the blog post."}
+                publishedAt={post?.publishedAt ? post.publishedAt : "2025-01-01T00:00:00Z"}
+                updatedAt={post?.publishedAt ? post.publishedAt : "2025-01-01T00:00:00Z"}
+                images={post?.featuredImage ? [post?.featuredImage] : []}
+                url={currentUrl}
+            />
             {post?.featuredImage && (
                 <div className="relative w-full h-[400px] pt-16">
                     <Image

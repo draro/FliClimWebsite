@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google';
 import Script from 'next/script';
 import { CookieBanner } from '@/components/CookieBanner';
 import { NextAuthProvider } from '@/components/NextAuthProvider';
+import { OrganizationJsonLd, ProductJsonLd } from '@/components/JsonLd';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -131,6 +132,8 @@ export default function RootLayout({
           />
         </noscript>
         <NextAuthProvider>
+          <OrganizationJsonLd />
+          <ProductJsonLd />
           {children}
         </NextAuthProvider>
         <CookieBanner />
