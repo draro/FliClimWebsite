@@ -3,15 +3,12 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { AlertTriangle, ArrowLeft, Home, Map, PlaneTakeoff } from 'lucide-react';
+import { ArrowLeft, Home, Map, PlaneTakeoff, AlertTriangle } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { FlightPlanList } from '@/components/FlightPlanList';
-import { FPLForm } from '@/components/FPLForm';
+import { AirportRisk } from '@/components/AirportRisk';
 import { cn } from '@/lib/utils';
 
-export default function FlightsPage() {
-    const [showFPLForm, setShowFPLForm] = useState(false);
-    const [currentFPL, setCurrentFPL] = useState<string | null>(null);
+export default function AirportsPage() {
     const [isDrawerOpen, setIsDrawerOpen] = useState(true);
 
     const menuItems = [
@@ -19,15 +16,6 @@ export default function FlightsPage() {
         { id: 'flights', label: 'Flight Plans', icon: PlaneTakeoff, href: '/demo/flights' },
         { id: 'airports', label: 'Airport Risk', icon: AlertTriangle, href: '/demo/airports' }
     ];
-
-    const handleViewFlight = (fpl: string) => {
-        setCurrentFPL(fpl);
-        setShowFPLForm(false);
-    };
-
-    const handleAddFlight = () => {
-        setShowFPLForm(true);
-    };
 
     return (
         <div className="relative h-screen flex">
@@ -62,7 +50,7 @@ export default function FlightsPage() {
                             href={item.href}
                             className={cn(
                                 "w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors",
-                                item.id === 'flights'
+                                item.id === 'airports'
                                     ? "bg-blue-50 text-blue-600"
                                     : "hover:bg-gray-100"
                             )}
@@ -97,29 +85,8 @@ export default function FlightsPage() {
             </div>
 
             {/* Main Content */}
-            <div className="flex-1 bg-gray-50 p-8 overflow-y-auto">
-                {showFPLForm ? (
-                    <div className="max-w-3xl mx-auto">
-                        <div className="bg-white rounded-lg shadow-lg p-6">
-                            <FPLForm
-                                onVisualize={(data, fpl) => {
-                                    setCurrentFPL(fpl);
-                                    setShowFPLForm(false);
-                                }}
-                                onLoad={() => { }}
-                                initialFPL={currentFPL}
-                            />
-                        </div>
-                    </div>
-                ) : (
-                    <div className="max-w-5xl mx-auto">
-                        <FlightPlanList
-                            onViewFlight={handleViewFlight}
-                            onAddFlight={handleAddFlight}
-                            risk_factors={null}
-                        />
-                    </div>
-                )}
+            <div className="flex-1 bg-gray-50">
+                <AirportRisk />
             </div>
         </div>
     );

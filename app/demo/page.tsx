@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { AlertTriangle, ArrowLeft, Home, Map, PlaneTakeoff } from 'lucide-react';
+import { ArrowLeft, Home, Map, PlaneTakeoff, AlertTriangle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { DemoContactForm } from '@/components/DemoContactForm';
@@ -26,27 +26,31 @@ const CesiumViewer = dynamic(
 );
 
 type MenuItem = 'map' | 'flights' | 'airports';
+
 export default function DemoPage() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
   const [activeMenuItem, setActiveMenuItem] = useState<MenuItem>('map');
   const [showContactForm, setShowContactForm] = useState(true);
-  const menuItems = [
-    { id: 'map', label: 'Interactive Map', icon: Map, href: '/demo' },
-    { id: 'flights', label: 'Flight Plans', icon: PlaneTakeoff, href: '/demo/flights' },
-    { id: 'airports', label: 'Airport Risk', icon: AlertTriangle, href: '#' }
-  ];
+
   useEffect(() => {
-    const hasSubmittedForm = localStorage.getItem('hasSubmittedForm');
-    if (hasSubmittedForm) {
+    // Check if user has already submitted the form
+    const hasSubmittedForm = localStorage.getItem('demoFormSubmitted');
+    if (hasSubmittedForm === 'true') {
       setShowContactForm(false);
     }
   }, []);
+
+  const menuItems = [
+    { id: 'map', label: 'Interactive Map', icon: Map, href: '/demo' },
+    { id: 'flights', label: 'Flight Plans', icon: PlaneTakeoff, href: '/demo/flights' },
+    { id: 'airports', label: 'Airport Risk', icon: AlertTriangle, href: '/demo/airports' }
+  ];
+
   const handleFormSubmit = () => {
-    localStorage.setItem('hasSubmittedForm', 'true');
+    // Store submission state in localStorage
+    localStorage.setItem('demoFormSubmitted', 'true');
     setShowContactForm(false);
   };
-
-
 
   const handleMenuClick = (menuId: MenuItem, e: React.MouseEvent) => {
     if (menuId === 'airports') {
@@ -54,7 +58,6 @@ export default function DemoPage() {
       setActiveMenuItem(menuId);
     }
   };
-
 
   return (
     <div className="relative h-screen flex">
@@ -93,7 +96,7 @@ export default function DemoPage() {
                   ? "bg-blue-50 text-blue-600"
                   : "hover:bg-gray-100"
               )}
-              onClick={() => setActiveMenuItem(item.id as MenuItem)}
+              onClick={(e) => handleMenuClick(item.id as MenuItem, e)}
             >
               <item.icon className="h-5 w-5 flex-shrink-0" />
               <span className={cn(
@@ -126,11 +129,9 @@ export default function DemoPage() {
 
       {/* Main Content */}
       <div className="flex-1 relative">
-        {/* <CesiumViewer /> */}
         {activeMenuItem === 'map' && <CesiumViewer />}
         {activeMenuItem === 'airports' && <AirportRisk />}
 
-        {/* Contact Form Overlay */}
         {/* Contact Form Overlay */}
         {showContactForm && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/50">

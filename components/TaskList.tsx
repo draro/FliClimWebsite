@@ -74,7 +74,7 @@ export function TaskList({ leadId, showInCalendar }: TaskListProps) {
     try {
       const url = new URL('/api/tasks', window.location.origin);
       if (leadId) url.searchParams.append('leadId', leadId);
-      
+
       const response = await fetch(url);
       if (!response.ok) throw new Error('Failed to fetch tasks');
       const data = await response.json();
@@ -93,7 +93,7 @@ export function TaskList({ leadId, showInCalendar }: TaskListProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       const response = await fetch('/api/tasks', {
         method: 'POST',
@@ -324,7 +324,7 @@ export function TaskList({ leadId, showInCalendar }: TaskListProps) {
 
         {!isLoading && tasks.length === 0 && (
           <div className="text-center py-8 text-gray-500">
-            No tasks found. Click "Add Task" to create one.
+            No tasks found. Click &quot;Add Task&quot; to create one.
           </div>
         )}
       </div>

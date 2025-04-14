@@ -148,7 +148,7 @@ export function DemoContactForm({ onSubmit }: DemoContactFormProps) {
                 </h2>
 
                 <p className="text-gray-600 text-center mb-6">
-                    Enter your details to access our interactive demo and explore FlyClim&apos;s capabilities.
+                    Enter your details to access our interactive demo and explore FlyClim&apos;s capabilities.<br /> Please note that this is a demo version and does not include all features of the full product.
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
