@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { BlogPostJsonLd } from './JsonLd';
 
 interface Post {
+    slug: string;
     _id: string;
     title: string;
     content: string;

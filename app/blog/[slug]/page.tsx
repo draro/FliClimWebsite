@@ -3,7 +3,15 @@ import { MongoClient } from 'mongodb';
 import { Navigation } from '@/components/Navigation';
 import { Footer } from '@/components/Footer';
 import { BlogPost } from '@/components/BlogPost';
-
+export interface Post {
+  _id: string;
+  title: string;
+  content: string;
+  excerpt: string;
+  publishedAt: string;
+  featuredImage?: string;
+  slug: string;
+}
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const client = await MongoClient.connect(process.env.MONGODB_URI!);
   const db = client.db('flyclim');
@@ -44,7 +52,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 export default async function BlogPostPage({ params }: { params: { slug: string } }) {
   const client = await MongoClient.connect(process.env.MONGODB_URI!);
   const db = client.db('flyclim');
-  const post = await db.collection('posts').findOne({ slug: params.slug });
+  const post = await db.collection('posts').findOne({ slug: params.slug }) as Post | null;
   await client.close();
 
   if (!post) {
