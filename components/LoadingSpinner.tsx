@@ -33,7 +33,7 @@ export function LoadingSpinner({ isVisible }: LoadingSpinnerProps) {
 
     ws.onmessage = (event) => {
       if (isVisibleRef.current) {
-        setWsMessages(prev => [...prev, event.data]);
+        setWsMessages(prev => [...prev, JSON.parse(event.data)]);
       }
     };
 

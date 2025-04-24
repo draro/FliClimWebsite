@@ -1,211 +1,230 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { AlertTriangle, Eye, Plus } from 'lucide-react';
-import { format } from 'date-fns';
-import { useToast } from '@/hooks/use-toast';
-import { FPLForm } from './FPLForm';
-import { Dialog, DialogContent } from './ui/dialog';
+import { useState, useEffect } from "react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Plus, Eye, AlertTriangle } from "lucide-react";
+import { format } from "date-fns";
+import { useToast } from "@/hooks/use-toast";
+import { useWebSocket } from "@/lib/websocket";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface Flight {
-    _id: string;
-    fpl: string;
-    adep: string;
-    ades: string;
-    dep_time: string;
-    arr_time: string;
-    eet_minutes: number;
-    fuel_burn_kg: number;
-    aircraft_type: string;
-    status?: 'active' | 'completed' | 'scheduled';
-    risk_level?: 'low' | 'medium' | 'high';
+  _id: string;
+  fpl: string;
+  adep: string;
+  ades: string;
+  dep_time: string;
+  arr_time: string;
+  eet_minutes: number;
+  fuel_burn_kg: number;
+  aircraft_type: string;
+  status?: "active" | "completed" | "scheduled";
+  storm_detected?: boolean;
+  collisions?: Array<{
+    segment_index: number;
+    segment_label: string;
+    from_coord: [number, number];
+    to_coord: [number, number];
+    timestamp: string;
+    distance_km: number;
+  }>;
 }
 
-export interface FlightPlanListProps {
-    onViewFlight: (fpl: string) => void;
-    onAddFlight: (() => void) | null;
-    risk_factors: any;
+interface FlightPlanListProps {
+  onViewFlight: (fpl: string) => void;
+  onAddFlight: () => void;
 }
 
-export function FlightPlanList({ onViewFlight, onAddFlight, risk_factors }: FlightPlanListProps) {
-    const [flights, setFlights] = useState<Flight[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [showFPLForm, setShowFPLForm] = useState(false);
-    const [showFlightData, setShowFlightData] = useState<string | null>(null);
-    const { toast } = useToast();
+export function FlightPlanList({
+  onViewFlight,
+  onAddFlight,
+}: FlightPlanListProps) {
+  const [flights, setFlights] = useState<Flight[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showCollisionDialog, setShowCollisionDialog] = useState(false);
+  const [selectedFlight, setSelectedFlight] = useState<Flight | null>(null);
+  const { messages } = useWebSocket("wss://demo.flyclim.com/ws/status");
+  const { toast } = useToast();
 
-    useEffect(() => {
-        fetchFlights();
-    }, []);
+  useEffect(() => {
+    fetchFlights();
+  }, []);
 
-    const fetchFlights = async () => {
-        try {
-            const response = await fetch('/api/flights');
-            if (!response.ok) throw new Error('Failed to fetch flights');
-            const data = await response.json();
-            setFlights(data.flights);
-        } catch (error) {
-            console.error('Failed to fetch flights:', error);
-            toast({
-                title: 'Error',
-                description: 'Failed to fetch flights',
-                variant: 'destructive'
-            });
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const getStatusColor = (status?: string) => {
-        switch (status) {
-            case 'active':
-                return 'bg-green-100 text-green-800';
-            case 'completed':
-                return 'bg-blue-100 text-blue-800';
-            case 'scheduled':
-                return 'bg-purple-100 text-purple-800';
-            default:
-                return 'bg-gray-100 text-gray-800';
-        }
-    };
-
-    const getRiskBadge = (risk?: string) => {
-        switch (risk) {
-            case 'high':
-                return (
-                    <div className="flex items-center gap-1 text-red-600">
-                        <AlertTriangle className="h-4 w-4" />
-                        <span className="text-xs font-medium">High Risk</span>
-                    </div>
-                );
-            case 'medium':
-                return (
-                    <div className="flex items-center gap-1 text-amber-600">
-                        <AlertTriangle className="h-4 w-4" />
-                        <span className="text-xs font-medium">Medium Risk</span>
-                    </div>
-                );
-            case 'low':
-                return (
-                    <div className="flex items-center gap-1 text-green-600">
-                        <AlertTriangle className="h-4 w-4" />
-                        <span className="text-xs font-medium">Low Risk</span>
-                    </div>
-                );
-            default:
-                return (
-                    <div className="flex items-center gap-1 text-grey-600">
-                        <AlertTriangle className="h-4 w-4" />
-                        <span className="text-xs font-medium">N/A</span>
-                    </div>
-                );
-        }
-    };
-
-    return (
-        <div className="space-y-4">
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold">Flight Plans</h2>
-                <Button onClick={onAddFlight ? onAddFlight : () => { setShowFPLForm(true) }} variant="default">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Flight Plan
-                </Button>
-            </div>
-
-            {isLoading ? (
-                <div className="flex justify-center py-8">
-                    <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
-                </div>
-            ) : (
-                <div className="grid gap-4">
-                    {flights.map((flight) => (
-                        <Card key={flight._id} className="p-4 hover:shadow-md transition-shadow">
-                            <div className="flex items-center justify-between">
-                                <div className="flex-1">
-                                    <div className="flex items-center gap-4 mb-2">
-                                        <div className="flex items-center gap-2">
-                                            <h3 className="text-lg font-semibold">
-                                                {flight.adep} → {flight.ades}
-                                            </h3>
-                                            <span className={`text-xs px-2 py-0.5 rounded-full ${getStatusColor(flight.status)}`}>
-                                                {flight.status || 'Pending'}
-                                            </span>
-                                        </div>
-                                        {getRiskBadge(risk_factors?.risk_level ? risk_factors?.risk_level : null)}
-                                    </div>
-
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600">
-                                        <div>
-                                            <p className="font-medium">Departure</p>
-                                            <p>{flight.dep_time}</p>
-                                            {/* <p>{format(new Date(flight.dep_time), 'HH:mm UTC')}</p> */}
-                                        </div>
-                                        <div>
-                                            <p className="font-medium">Arrival</p>
-                                            {/* <p>{format(new Date(flight.arr_time), 'HH:mm UTC')}</p> */}
-                                            <p>{flight.arr_time}</p>
-                                        </div>
-                                        <div>
-                                            <p className="font-medium">Flight Time</p>
-                                            <p>{Math.floor(flight.eet_minutes / 60)}h {flight.eet_minutes % 60}m</p>
-                                        </div>
-                                        <div>
-                                            <p className="font-medium">Aircraft</p>
-                                            <p>{flight.aircraft_type}</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <Button
-                                    variant="outline"
-                                    onClick={() => onViewFlight(flight.fpl)}
-                                    className="ml-4"
-                                >
-                                    <Eye className="h-4 w-4 mr-2" />
-                                    View Route
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    onClick={() => setShowFlightData(flight.fpl)}
-                                    className="ml-4"
-                                >
-                                    <Eye className="h-4 w-4 mr-2" />
-                                    Show Flight
-                                </Button>
-                            </div>
-                        </Card>
-                    ))}
-
-                    {flights.length === 0 && (
-                        <div className="text-center py-8 text-gray-500">
-                            No flight plans found. Click &quot;Add Flight Plan&quot; to create one.
-                        </div>
-                    )}
-                </div>
-            )}
-            {showFlightData && (
-                <Dialog open={Boolean(showFlightData)} onOpenChange={() => setShowFlightData(null)}>
-                    <DialogContent className='max-w-3xl'>
-                        <div className="flex items-center justify-between bg-gray-100 p-4 rounded-md ">
-                            <div className="flex items-center gap-2 flex-wrap w-full">
-                                {/* <AlertTriangle className="h-4 w-4 text-red-600" /> */}
-                                <pre className="text-sm font-medium ">{showFlightData}</pre>
-                            </div>
-                        </div>
-                    </DialogContent>
-                </Dialog>
+  useEffect(() => {
+    // Update flights when receiving WebSocket messages
+    if (messages.length > 0) {
+      try {
+        const latestMessage = messages[messages.length - 1];
+        // Try to parse the message as JSON
+        const data = JSON.parse(latestMessage);
+        if (data._id) {
+          // Update the specific flight in the list
+          setFlights((prev) =>
+            prev.map((flight) =>
+              flight._id === data._id ? { ...flight, ...data } : flight
             )
-            }
-            {
-                showFPLForm &&
-                <Dialog open={showFPLForm} onOpenChange={setShowFPLForm}>
-                    <DialogContent className='max-w-3xl'>
-                        <FPLForm onClose={() => setShowFPLForm(false)} onVisualize={fetchFlights} />
-                    </DialogContent>
-                </Dialog>
-            }
-        </div >
-    );
+          );
+
+          // Show toast for storm detection
+          if (data.storm_detected) {
+            toast({
+              title: "Storm Warning",
+              description: "Storm detected along flight path",
+              variant: "destructive",
+            });
+          }
+        }
+      } catch (e) {
+        console.log("WebSocket message:", messages[messages.length - 1]);
+      }
+    }
+  }, [messages, toast]);
+
+  const fetchFlights = async () => {
+    try {
+      const response = await fetch("/api/flights");
+      if (!response.ok) throw new Error("Failed to fetch flights");
+      const data = await response.json();
+      setFlights(data.flights);
+    } catch (error) {
+      console.error("Failed to fetch flights:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch flights",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleShowCollisions = (flight: Flight) => {
+    setSelectedFlight(flight);
+    setShowCollisionDialog(true);
+  };
+
+  const formatDateTime = (dateStr: string) => {
+    return format(new Date(dateStr), "MMM d, yyyy HH:mm");
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-semibold">Flight Plans</h2>
+        <Button onClick={onAddFlight}>
+          <Plus className="h-4 w-4 mr-2" />
+          Add Flight Plan
+        </Button>
+      </div>
+
+      {isLoading ? (
+        <div className="flex justify-center py-8">
+          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+        </div>
+      ) : (
+        <div className="grid gap-4">
+          {flights.map((flight) => (
+            <Card
+              key={flight._id}
+              className="p-4 hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-4 mb-2">
+                    <h3 className="text-lg font-semibold">
+                      {flight.adep} → {flight.ades}
+                    </h3>
+                    {flight.storm_detected && (
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleShowCollisions(flight)}
+                      >
+                        <AlertTriangle className="h-4 w-4 mr-2" />
+                        Storm Warning
+                      </Button>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600">
+                    <div>
+                      <p className="font-medium">Departure</p>
+                      <p>{formatDateTime(flight.dep_time)}</p>
+                    </div>
+                    <div>
+                      <p className="font-medium">Arrival</p>
+                      <p>{formatDateTime(flight.arr_time)}</p>
+                    </div>
+                    <div>
+                      <p className="font-medium">Flight Time</p>
+                      <p>
+                        {Math.floor(flight.eet_minutes / 60)}h{" "}
+                        {flight.eet_minutes % 60}m
+                      </p>
+                    </div>
+                    <div>
+                      <p className="font-medium">Aircraft</p>
+                      <p>{flight.aircraft_type}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <Button
+                  variant="outline"
+                  onClick={() => onViewFlight(flight.fpl)}
+                  className="ml-4"
+                >
+                  <Eye className="h-4 w-4 mr-2" />
+                  View Route
+                </Button>
+              </div>
+            </Card>
+          ))}
+
+          {flights.length === 0 && (
+            <div className="text-center py-8 text-gray-500">
+              No flight plans found. Click &quot;Add Flight Plan&quot; to create
+              one.
+            </div>
+          )}
+        </div>
+      )}
+
+      <Dialog open={showCollisionDialog} onOpenChange={setShowCollisionDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Storm Collision Details</DialogTitle>
+            <DialogDescription>
+              The following route segments have potential storm collisions:
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 mt-4">
+            {selectedFlight?.collisions?.map((collision, index) => (
+              <div key={index} className="p-4 bg-red-50 rounded-lg">
+                <div className="font-medium text-red-700 mb-2">
+                  Segment: {collision.segment_label}
+                </div>
+                <div className="text-sm text-red-600 space-y-1">
+                  <p>Time: {format(new Date(collision.timestamp), "PPp")}</p>
+                  <p>Distance: {collision.distance_km.toFixed(1)} km</p>
+                  <p>
+                    Coordinates: [{collision.from_coord.join(", ")}] → [
+                    {collision.to_coord.join(", ")}]
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
 }
