@@ -40,6 +40,14 @@ interface Flight {
 interface FlightPlanListProps {
   onViewFlight: (fpl: string) => void;
   onAddFlight: () => void;
+  risk_factors?: {
+    storm_detected: boolean;
+    extra_time_minutes: number;
+    risk_score: number;
+    risk_level: string;
+    risk_factors: string[];
+    fpl_string: string;
+  };
 }
 
 export function FlightPlanList({

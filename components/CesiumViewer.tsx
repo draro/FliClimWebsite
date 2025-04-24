@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useEffect, useRef, useState, useCallback } from 'react';
-import { WebSocketStatus } from '@/components/WebSocketStatus';
-import { LoadingSpinner } from '@/components/LoadingSpinner';
-import { Button } from '@/components/ui/button';
-import { ChevronLeft, AlertTriangle } from 'lucide-react';
+import { useEffect, useRef, useState, useCallback } from "react";
+import { WebSocketStatus } from "@/components/WebSocketStatus";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, AlertTriangle } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -12,8 +12,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { FlightPlanList } from '@/components/FlightPlanList';
-import type { LineString } from 'geojson';
+import { FlightPlanList } from "@/components/FlightPlanList";
+import type { LineString } from "geojson";
 
 declare global {
   interface Window {
@@ -86,18 +86,20 @@ export default function CesiumViewer() {
   const viewerRef = useRef<any>(null);
   const stormCache = useRef<Record<string, any>>({});
   const currentStormLayer = useRef<any[]>([]);
-  const lastTimeBucket = useRef<string>('');
+  const lastTimeBucket = useRef<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [showFlightList, setShowFlightList] = useState(true);
   const [routeData, setRouteData] = useState<RouteResponse | null>(null);
   const [showAirportRisk, setShowAirportRisk] = useState(false);
-  const [selectedAirport, setSelectedAirport] = useState<AirportRisk | null>(null);
+  const [selectedAirport, setSelectedAirport] = useState<AirportRisk | null>(
+    null
+  );
   const [isLoadingAirport, setIsLoadingAirport] = useState(false);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
 
-    const viewer = new window.Cesium.Viewer('cesiumContainer', {
+    const viewer = new window.Cesium.Viewer("cesiumContainer", {
       timeline: true,
       animation: true,
       baseLayerPicker: false,
@@ -113,10 +115,10 @@ export default function CesiumViewer() {
     viewer.clock.multiplier = 30;
 
     window.Cesium.Model.fromGltfAsync({
-      url: '/models/ELAL.glb',
-      scale: 1.0
+      url: "/models/ELAL.glb",
+      scale: 1.0,
     }).catch((error: any) => {
-      console.warn('Failed to preload aircraft model:', error);
+      console.warn("Failed to preload aircraft model:", error);
     });
 
     viewerRef.current = viewer;
@@ -131,21 +133,28 @@ export default function CesiumViewer() {
   const fetchAirportRisk = async (icao: string) => {
     try {
       setIsLoadingAirport(true);
-      const response = await fetch(`https://demo.flyclim.com/api/airport_risk/${icao}`);
-      if (!response.ok) throw new Error('Failed to fetch airport risk data');
+      const response = await fetch(
+        `https://demo.flyclim.com/api/airport_risk/${icao}`
+      );
+      if (!response.ok) throw new Error("Failed to fetch airport risk data");
       const data = await response.json();
       setSelectedAirport(data);
       setShowAirportRisk(true);
     } catch (error) {
-      console.error('Error fetching airport risk:', error);
+      console.error("Error fetching airport risk:", error);
     } finally {
       setIsLoadingAirport(false);
     }
   };
 
   const safeFromDegrees = (lon: number, lat: number, alt = 0) => {
-    if (typeof lon !== 'number' || typeof lat !== 'number' || isNaN(lon) || isNaN(lat)) {
-      console.warn('❌ Invalid coord:', lon, lat);
+    if (
+      typeof lon !== "number" ||
+      typeof lat !== "number" ||
+      isNaN(lon) ||
+      isNaN(lat)
+    ) {
+      console.warn("❌ Invalid coord:", lon, lat);
       return null;
     }
     return window.Cesium.Cartesian3.fromDegrees(lon, lat, alt);
@@ -153,19 +162,20 @@ export default function CesiumViewer() {
 
   const roundTo5Minutes = (date: Date): string => {
     if (!(date instanceof Date) || isNaN(date.getTime())) {
-      console.warn('❌ Invalid date provided to roundTo5Minutes:', date);
+      console.warn("❌ Invalid date provided to roundTo5Minutes:", date);
       return new Date().toISOString();
     }
 
-    const roundedTime = Math.floor(date.getTime() / (5 * 60 * 1000)) * 5 * 60 * 1000;
+    const roundedTime =
+      Math.floor(date.getTime() / (5 * 60 * 1000)) * 5 * 60 * 1000;
     return new Date(roundedTime).toISOString();
   };
 
   const clearStormCache = () => {
     stormCache.current = {};
-    lastTimeBucket.current = '';
+    lastTimeBucket.current = "";
     if (currentStormLayer.current.length > 0 && viewerRef.current) {
-      currentStormLayer.current.forEach(entity => {
+      currentStormLayer.current.forEach((entity) => {
         viewerRef.current.entities.remove(entity);
       });
       currentStormLayer.current = [];
@@ -178,9 +188,12 @@ export default function CesiumViewer() {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 180000);
 
-      const res = await fetch(`https://demo.flyclim.com/api/storms?from_time=${isoTime}`, {
-        signal: controller.signal
-      });
+      const res = await fetch(
+        `https://demo.flyclim.com/api/storms?from_time=${isoTime}`,
+        {
+          signal: controller.signal,
+        }
+      );
 
       clearTimeout(timeoutId);
 
@@ -190,10 +203,10 @@ export default function CesiumViewer() {
       stormCache.current[isoTime] = geojson;
       return geojson;
     } catch (err: any) {
-      if (err.name === 'AbortError') {
-        console.warn('Storm fetch timed out after 3 minutes');
+      if (err.name === "AbortError") {
+        console.warn("Storm fetch timed out after 3 minutes");
       } else {
-        console.warn('Storm fetch failed:', err);
+        console.warn("Storm fetch failed:", err);
       }
       return null;
     }
@@ -208,14 +221,14 @@ export default function CesiumViewer() {
     if (!geojson) return;
 
     if (currentStormLayer.current.length > 0) {
-      currentStormLayer.current.forEach(entity => {
+      currentStormLayer.current.forEach((entity) => {
         viewerRef.current.entities.remove(entity);
       });
       currentStormLayer.current = [];
     }
 
     for (const feature of geojson.features) {
-      if (feature.geometry.type === 'Polygon') {
+      if (feature.geometry.type === "Polygon") {
         const coordinates = feature.geometry.coordinates[0] as Coordinate[];
         const baseHeight = 600;
         const topHeight = Math.random() * (12000 - 9500) + 9500;
@@ -227,17 +240,27 @@ export default function CesiumViewer() {
           const wall = viewerRef.current.entities.add({
             wall: {
               positions: window.Cesium.Cartesian3.fromDegreesArrayHeights([
-                lon1, lat1, baseHeight,
-                lon2, lat2, baseHeight,
-                lon2, lat2, topHeight,
-                lon1, lat1, topHeight,
-                lon1, lat1, baseHeight
+                lon1,
+                lat1,
+                baseHeight,
+                lon2,
+                lat2,
+                baseHeight,
+                lon2,
+                lat2,
+                topHeight,
+                lon1,
+                lat1,
+                topHeight,
+                lon1,
+                lat1,
+                baseHeight,
               ]),
               material: window.Cesium.Color.RED.withAlpha(0.3),
               outline: true,
               outlineColor: window.Cesium.Color.RED,
-              outlineWidth: 1
-            }
+              outlineWidth: 1,
+            },
           });
           currentStormLayer.current.push(wall);
         }
@@ -255,8 +278,8 @@ export default function CesiumViewer() {
             material: window.Cesium.Color.RED.withAlpha(0.3),
             outline: true,
             outlineColor: window.Cesium.Color.RED,
-            outlineWidth: 1
-          }
+            outlineWidth: 1,
+          },
         });
         currentStormLayer.current.push(topPolygon);
 
@@ -266,8 +289,8 @@ export default function CesiumViewer() {
             material: window.Cesium.Color.RED.withAlpha(0.3),
             outline: true,
             outlineColor: window.Cesium.Color.RED,
-            outlineWidth: 1
-          }
+            outlineWidth: 1,
+          },
         });
         currentStormLayer.current.push(bottomPolygon);
       }
@@ -305,7 +328,7 @@ export default function CesiumViewer() {
 
       return departureDate;
     } catch (err) {
-      console.warn('Failed to parse FPL time:', err);
+      console.warn("Failed to parse FPL time:", err);
       return null;
     }
   };
@@ -316,13 +339,13 @@ export default function CesiumViewer() {
     const fallbackPoint = {
       position,
       label: {
-        text: properties.popup || '',
-        font: '14px sans-serif',
+        text: properties.popup || "",
+        font: "14px sans-serif",
         style: window.Cesium.LabelStyle.FILL_AND_OUTLINE,
         outlineWidth: 2,
         verticalOrigin: window.Cesium.VerticalOrigin.BOTTOM,
-        pixelOffset: new window.Cesium.Cartesian2(0, -10)
-      }
+        pixelOffset: new window.Cesium.Cartesian2(0, -10),
+      },
     };
 
     if (!style.iconUrl) {
@@ -341,16 +364,16 @@ export default function CesiumViewer() {
           image: style.iconUrl,
           width: style.iconSize?.[0] || 28,
           height: style.iconSize?.[1] || 28,
-          verticalOrigin: window.Cesium.VerticalOrigin.BOTTOM
+          verticalOrigin: window.Cesium.VerticalOrigin.BOTTOM,
         },
         label: {
-          text: properties.popup || '',
-          font: '14px sans-serif',
+          text: properties.popup || "",
+          font: "14px sans-serif",
           style: window.Cesium.LabelStyle.FILL_AND_OUTLINE,
           outlineWidth: 2,
           verticalOrigin: window.Cesium.VerticalOrigin.BOTTOM,
-          pixelOffset: new window.Cesium.Cartesian2(0, -40)
-        }
+          pixelOffset: new window.Cesium.Cartesian2(0, -40),
+        },
       });
     };
     img.src = style.iconUrl;
@@ -359,21 +382,21 @@ export default function CesiumViewer() {
   const handleViewFlight = async (fpl: string) => {
     try {
       setIsLoading(true);
-      const response = await fetch('https://demo.flyclim.com/api/route', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fpl })
+      const response = await fetch("https://demo.flyclim.com/api/route", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fpl }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to visualize route');
+        throw new Error("Failed to visualize route");
       }
 
       const data = await response.json();
       visualizeRoute(data, fpl);
       setShowFlightList(false);
     } catch (error) {
-      console.error('Failed to visualize flight:', error);
+      console.error("Failed to visualize flight:", error);
     } finally {
       setIsLoading(false);
     }
@@ -383,8 +406,8 @@ export default function CesiumViewer() {
   }
   const visualizeRoute = async (data: RouteResponse, fpl: string) => {
     try {
-      if (!data || data.type !== 'FeatureCollection' || !data.features.length) {
-        alert('⚠️ Invalid GeoJSON route received.');
+      if (!data || data.type !== "FeatureCollection" || !data.features.length) {
+        alert("⚠️ Invalid GeoJSON route received.");
         return;
       }
 
@@ -399,15 +422,15 @@ export default function CesiumViewer() {
       if (isLineString(data.original_route?.geometry.type)) {
         const originalPositions = data.original_route.geometry.coordinates
           .map(([lon, lat]) => safeFromDegrees(lon, lat, 10600))
-          .filter(p => p);
+          .filter((p) => p);
 
         viewer.entities.add({
           polyline: {
             positions: originalPositions,
             width: 3,
             material: window.Cesium.Color.ORANGE.withAlpha(0.5),
-            clampToGround: true
-          }
+            clampToGround: true,
+          },
         });
       }
 
@@ -415,12 +438,12 @@ export default function CesiumViewer() {
       const startJulian = window.Cesium.JulianDate.fromDate(departureTime);
 
       const safePoints = data.features
-        .filter(f => f.geometry.type === 'Point')
-        .map(f => ({
+        .filter((f) => f.geometry.type === "Point")
+        .map((f) => ({
           coordinates: f.geometry.coordinates,
           time: f.properties.time ? new Date(f.properties.time) : null,
           style: f.properties.style || {},
-          properties: f.properties
+          properties: f.properties,
         }))
         .filter((p): p is SafePoint => p.time !== null)
         .sort((a, b) => a.time.getTime() - b.time.getTime());
@@ -437,35 +460,42 @@ export default function CesiumViewer() {
         safePoints.forEach((point, index) => {
           if (index === 0 || index === safePoints.length - 1) {
             const icao = index === 0 ? adep : ades;
-            const position = safeFromDegrees(point.coordinates[0], point.coordinates[1], 0);
+            const position = safeFromDegrees(
+              point.coordinates[0],
+              point.coordinates[1],
+              0
+            );
             if (position) {
               viewer.entities.add({
                 position,
                 billboard: {
-                  image: '/airport-icon.png',
+                  image: "/airport-icon.png",
                   verticalOrigin: window.Cesium.VerticalOrigin.BOTTOM,
-                  scale: 0.5
+                  scale: 0.5,
                 },
                 label: {
                   text: icao,
-                  font: '14px sans-serif',
+                  font: "14px sans-serif",
                   style: window.Cesium.LabelStyle.FILL_AND_OUTLINE,
                   outlineWidth: 2,
                   verticalOrigin: window.Cesium.VerticalOrigin.BOTTOM,
-                  pixelOffset: new window.Cesium.Cartesian2(0, -40)
-                }
+                  pixelOffset: new window.Cesium.Cartesian2(0, -40),
+                },
               });
 
               // Add click handler
-              viewer.screenSpaceEventHandler.setInputAction(async (click: any) => {
-                const pickedObject = viewer.scene.pick(click.position);
-                if (window.Cesium.defined(pickedObject)) {
-                  const entity = pickedObject.id;
-                  if (entity.label && entity.label.text._value === icao) {
-                    await fetchAirportRisk(icao);
+              viewer.screenSpaceEventHandler.setInputAction(
+                async (click: any) => {
+                  const pickedObject = viewer.scene.pick(click.position);
+                  if (window.Cesium.defined(pickedObject)) {
+                    const entity = pickedObject.id;
+                    if (entity.label && entity.label.text._value === icao) {
+                      await fetchAirportRisk(icao);
+                    }
                   }
-                }
-              }, window.Cesium.ScreenSpaceEventType.LEFT_CLICK);
+                },
+                window.Cesium.ScreenSpaceEventType.LEFT_CLICK
+              );
             }
           }
         });
@@ -486,7 +516,9 @@ export default function CesiumViewer() {
         }
       });
 
-      const stopJulian = window.Cesium.JulianDate.fromDate(safePoints[safePoints.length - 1].time);
+      const stopJulian = window.Cesium.JulianDate.fromDate(
+        safePoints[safePoints.length - 1].time
+      );
 
       viewer.clock.startTime = startJulian.clone();
       viewer.clock.currentTime = startJulian.clone();
@@ -496,53 +528,59 @@ export default function CesiumViewer() {
       viewer.clock.multiplier = 30;
 
       const positions = safePoints
-        .map(p => safeFromDegrees(p.coordinates[0], p.coordinates[1], 10600))
-        .filter(p => p);
+        .map((p) => safeFromDegrees(p.coordinates[0], p.coordinates[1], 10600))
+        .filter((p) => p);
 
       viewer.entities.add({
         polyline: {
           positions,
           width: 3,
-          material: window.Cesium.Color.CYAN
-        }
+          material: window.Cesium.Color.CYAN,
+        },
       });
 
       try {
         const aircraft = viewer.entities.add({
           availability: new window.Cesium.TimeIntervalCollection([
-            new window.Cesium.TimeInterval({ start: startJulian, stop: stopJulian })
+            new window.Cesium.TimeInterval({
+              start: startJulian,
+              stop: stopJulian,
+            }),
           ]),
           position: property,
           orientation: new window.Cesium.VelocityOrientationProperty(property),
           model: {
-            uri: '/models/ELAL.glb',
+            uri: "/models/ELAL.glb",
             minimumPixelSize: 64,
-            maximumScale: 10000
+            maximumScale: 10000,
           },
           path: {
             resolution: 1,
             material: window.Cesium.Color.YELLOW,
-            width: 2
-          }
+            width: 2,
+          },
         });
 
         viewer.trackedEntity = aircraft;
       } catch (modelError) {
-        console.error('Failed to load aircraft model:', modelError);
+        console.error("Failed to load aircraft model:", modelError);
         const aircraft = viewer.entities.add({
           availability: new window.Cesium.TimeIntervalCollection([
-            new window.Cesium.TimeInterval({ start: startJulian, stop: stopJulian })
+            new window.Cesium.TimeInterval({
+              start: startJulian,
+              stop: stopJulian,
+            }),
           ]),
           position: property,
           point: {
             pixelSize: 10,
-            color: window.Cesium.Color.YELLOW
+            color: window.Cesium.Color.YELLOW,
           },
           path: {
             resolution: 1,
             material: window.Cesium.Color.YELLOW,
-            width: 2
-          }
+            width: 2,
+          },
         });
 
         viewer.trackedEntity = aircraft;
@@ -557,8 +595,8 @@ export default function CesiumViewer() {
         orientation: {
           heading: window.Cesium.Math.toRadians(0),
           pitch: window.Cesium.Math.toRadians(-45),
-          roll: 0
-        }
+          roll: 0,
+        },
       });
     } finally {
       setIsLoading(false);
@@ -569,7 +607,9 @@ export default function CesiumViewer() {
     if (!viewerRef.current) return;
 
     viewerRef.current.clock.onTick.addEventListener(() => {
-      const now = window.Cesium.JulianDate.toDate(viewerRef.current.clock.currentTime);
+      const now = window.Cesium.JulianDate.toDate(
+        viewerRef.current.clock.currentTime
+      );
       updateStormLayer(now);
     });
   }, [updateStormLayer]);
@@ -579,11 +619,17 @@ export default function CesiumViewer() {
       <div id="cesiumContainer" className="absolute inset-0" />
 
       {/* Flight List Panel */}
-      <div className={`absolute top-4 left-20 transition-transform duration-300 `}>
-        <div className={`w-[800px] h-[500px] overflow-auto bg-white/95 backdrop-blur-sm shadow-lg rounded-lg ${!showFlightList && 'hidden m-20'}`}>
+      <div
+        className={`absolute top-4 left-20 transition-transform duration-300 `}
+      >
+        <div
+          className={`w-[800px] h-[500px] overflow-auto bg-white/95 backdrop-blur-sm shadow-lg rounded-lg ${
+            !showFlightList && "hidden m-20"
+          }`}
+        >
           <FlightPlanList
             onViewFlight={handleViewFlight}
-            onAddFlight={null}
+            onAddFlight={() => {}}
             risk_factors={routeData?.properties}
           />
         </div>
@@ -593,7 +639,11 @@ export default function CesiumViewer() {
           className="absolute -right-10 top-0 bg-white/95"
           onClick={() => setShowFlightList(!showFlightList)}
         >
-          {showFlightList ? <ChevronLeft className="h-4 w-4" /> : "Flight Plans"}
+          {showFlightList ? (
+            <ChevronLeft className="h-4 w-4" />
+          ) : (
+            "Flight Plans"
+          )}
         </Button>
       </div>
 
@@ -611,14 +661,16 @@ export default function CesiumViewer() {
               </SheetTitle>
               <SheetDescription>
                 <div className="mt-4 space-y-4">
-                  {routeData.properties.risk_factors?.map((risk: string, index: number) => (
-                    <div
-                      key={index}
-                      className="flex items-start gap-2 text-left"
-                    >
-                      <span className="text-red-500">{risk}</span>
-                    </div>
-                  ))}
+                  {routeData.properties.risk_factors?.map(
+                    (risk: string, index: number) => (
+                      <div
+                        key={index}
+                        className="flex items-start gap-2 text-left"
+                      >
+                        <span className="text-red-500">{risk}</span>
+                      </div>
+                    )
+                  )}
                 </div>
               </SheetDescription>
             </SheetHeader>
