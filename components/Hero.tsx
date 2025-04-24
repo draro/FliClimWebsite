@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/ui/button';
-import { motion } from 'framer-motion';
-import Link from 'next/link';
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+import Link from "next/link";
 import { Linkedin, XIcon, Youtube, Facebook } from "lucide-react";
 export function Hero() {
   return (
@@ -33,7 +33,9 @@ export function Hero() {
             AI-Powered Weather Optimization for Smarter Aviation Operations
           </p>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Join the future of aviation. FlyClim helps airlines reduce costly weather-related delays with predictive routing intelligence—saving time, fuel, and operational costs.
+            Join the future of aviation. FlyClim helps airlines reduce costly
+            weather-related delays with predictive routing intelligence—saving
+            time, fuel, and operational costs.
           </p>
         </motion.div>
 
@@ -44,16 +46,13 @@ export function Hero() {
           transition={{ duration: 0.8, delay: 0.4 }}
         >
           <Link href="/pilot-program" passHref>
-            <Button size="lg">
-              Join Our Pilot Program
-            </Button>
+            <Button size="lg">Join Our Pilot Program</Button>
           </Link>
           <Link href="/demo" passHref>
             <Button size="lg" variant="outline">
               Try Live Demo
             </Button>
           </Link>
-
         </motion.div>
         <motion.div
           className="mt-12 flex justify-center gap-4"
@@ -83,8 +82,8 @@ export function Hero() {
               <span className="sr-only">LinkedIn</span>
             </Button>
           </a>
-          {/* <a
-            href="https://github.com/flyclim"
+          <a
+            href="https://www.facebook.com/flyclim/"
             target="_blank"
             rel="noopener noreferrer"
             className="text-gray-600 hover:text-gray-900 transition-colors"
@@ -94,7 +93,7 @@ export function Hero() {
               <span className="sr-only">Facebook</span>
             </Button>
           </a>
-          <a
+          {/* <a
             href="https://youtube.com/@flyclim"
             target="_blank"
             rel="noopener noreferrer"

@@ -1,30 +1,31 @@
-'use client';
+"use client";
 
-import { Organization, WithContext } from 'schema-dts';
+import { Organization, WithContext } from "schema-dts";
 
 export function OrganizationJsonLd() {
   const organizationData: WithContext<Organization> = {
-    '@context': 'https://schema.org',
-    '@type': 'Organization',
-    name: 'FlyClim',
-    url: 'https://flyclim.com',
-    logo: 'https://flyclim.com/logo.png',
-    description: 'AI-Powered Weather Optimization for Smarter Aviation Operations',
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "FlyClim",
+    url: "https://flyclim.com",
+    logo: "https://flyclim.com/logo.png",
+    description:
+      "AI-Powered Weather Optimization for Smarter Aviation Operations",
     sameAs: [
-      'https://twitter.com/flyclim',
-      'https://linkedin.com/company/flyclim',
-      'https://github.com/flyclim'
+      // 'https://twitter.com/flyclim',
+      "https://linkedin.com/company/flyclim",
+      "https://www.facebook.com/flyclim/",
     ],
-    address: {
-      '@type': 'PostalAddress',
-      addressCountry: 'US'
-    },
+    // address: {
+    //   '@type': 'PostalAddress',
+    //   addressCountry: 'US'
+    // },
     contactPoint: {
-      '@type': 'ContactPoint',
-      telephone: '+1-555-123-4567',
-      contactType: 'customer service',
-      email: 'info@flyclim.com'
-    }
+      "@type": "ContactPoint",
+      telephone: "+1-989-447-2494",
+      contactType: "customer service",
+      email: "info@flyclim.com",
+    },
   };
 
   return (
@@ -40,9 +41,9 @@ export function BlogPostJsonLd({
   description,
   publishedAt,
   updatedAt,
-  authorName = 'FlyClim Team',
+  authorName = "FlyClim Team",
   images = [],
-  url
+  url,
 }: {
   title: string;
   description: string;
@@ -53,29 +54,29 @@ export function BlogPostJsonLd({
   url: string;
 }) {
   const blogPostData = {
-    '@context': 'https://schema.org',
-    '@type': 'BlogPosting',
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
     headline: title,
     description: description,
-    image: images.length > 0 ? images : ['https://flyclim.com/logo.png'],
+    image: images.length > 0 ? images : ["https://flyclim.com/logo.png"],
     datePublished: publishedAt,
     dateModified: updatedAt || publishedAt,
     author: {
-      '@type': 'Person',
+      "@type": "Person",
       name: authorName,
     },
     publisher: {
-      '@type': 'Organization',
-      name: 'FlyClim',
+      "@type": "Organization",
+      name: "FlyClim",
       logo: {
-        '@type': 'ImageObject',
-        url: 'https://flyclim.com/logo.png'
-      }
+        "@type": "ImageObject",
+        url: "https://flyclim.com/logo.png",
+      },
     },
     mainEntityOfPage: {
-      '@type': 'WebPage',
-      '@id': url
-    }
+      "@type": "WebPage",
+      "@id": url,
+    },
   };
 
   return (
@@ -88,23 +89,24 @@ export function BlogPostJsonLd({
 
 export function ProductJsonLd() {
   const productData = {
-    '@context': 'https://schema.org',
-    '@type': 'SoftwareApplication',
-    name: 'FlyClim Storm Viewer',
-    applicationCategory: 'BusinessApplication',
-    operatingSystem: 'Web',
-    description: 'AI-powered weather optimization platform for aviation operations',
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "FlyClim Solutions",
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web",
+    description:
+      "AI-powered weather optimization platform for aviation operations",
     offers: {
-      '@type': 'Offer',
-      price: '0',
-      priceCurrency: 'USD',
-      availability: 'https://schema.org/InStock'
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+      availability: "https://schema.org/InStock",
     },
     aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.8',
-      ratingCount: '127'
-    }
+      "@type": "AggregateRating",
+      ratingValue: "4.8",
+      ratingCount: "127",
+    },
   };
 
   return (
