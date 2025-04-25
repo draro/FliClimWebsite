@@ -15,7 +15,9 @@ export function WebSocketStatus() {
     };
 
     ws.onmessage = (event) => {
-      setMessage(`${!event.data.startsWith('{')? `📡 ${event.data}`:null}`);
+     if( !event.data.startsWith('{')){
+        setMessage(event.data);
+      } 
     };
 
     ws.onclose = () => {
