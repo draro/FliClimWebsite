@@ -2,55 +2,55 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://www.flyclim.com</loc>
-    <lastmod>2025-04-25T04:55:31.353Z</lastmod>
+    <lastmod>2025-05-05T17:46:27.965Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.flyclim.com/about</loc>
-    <lastmod>2025-04-25T04:55:31.353Z</lastmod>
+    <lastmod>2025-05-05T17:46:27.994Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.flyclim.com/solutions</loc>
-    <lastmod>2025-04-25T04:55:31.353Z</lastmod>
+    <lastmod>2025-05-05T17:46:27.994Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.flyclim.com/team</loc>
-    <lastmod>2025-04-25T04:55:31.353Z</lastmod>
+    <lastmod>2025-05-05T17:46:27.994Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.flyclim.com/pilot-program</loc>
-    <lastmod>2025-04-25T04:55:31.353Z</lastmod>
+    <lastmod>2025-05-05T17:46:27.994Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.flyclim.com/contact</loc>
-    <lastmod>2025-04-25T04:55:31.353Z</lastmod>
+    <lastmod>2025-05-05T17:46:27.994Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.flyclim.com/demo</loc>
-    <lastmod>2025-04-25T04:55:31.353Z</lastmod>
+    <lastmod>2025-05-05T17:46:27.994Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.flyclim.com/privacy</loc>
-    <lastmod>2025-04-25T04:55:31.353Z</lastmod>
+    <lastmod>2025-05-05T17:46:27.994Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.flyclim.com/terms</loc>
-    <lastmod>2025-04-25T04:55:31.353Z</lastmod>
+    <lastmod>2025-05-05T17:46:27.994Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -147,6 +147,18 @@
   <url>
     <loc>https://www.flyclim.com/blog/navigating-the-skies-the-lifecycle-of-an-aip-amendment-in-aviation-weather-optimization</loc>
     <lastmod>2025-04-24T11:04:12.365Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.flyclim.com/blog/why-cybersecurity-is-now-a-top-priority-for-airlines</loc>
+    <lastmod>2025-04-27T07:00:33.967Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.flyclim.com/blog/assessing-the-accuracy-of-turbulence-forecasting-where-are-we-today</loc>
+    <lastmod>2025-05-04T08:23:48.680Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>

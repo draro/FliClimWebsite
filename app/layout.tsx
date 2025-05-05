@@ -1,86 +1,94 @@
-import './globals.css';
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import Script from 'next/script';
-import { CookieBanner } from '@/components/CookieBanner';
-import { NextAuthProvider } from '@/components/NextAuthProvider';
-import { OrganizationJsonLd, ProductJsonLd } from '@/components/JsonLd';
+import "./globals.css";
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import Script from "next/script";
+import { CookieBanner } from "@/components/CookieBanner";
+import { NextAuthProvider } from "@/components/NextAuthProvider";
+import { OrganizationJsonLd, ProductJsonLd } from "@/components/JsonLd";
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
-    default: 'FlyClim | AI-Powered Weather Optimization',
-    template: '%s | FlyClim'
+    default: "FlyClim | AI-Powered Weather Optimization",
+    template: "%s | FlyClim",
   },
   alternates: {
     canonical: `https://www.flyclim.com`,
   },
-  description: 'FlyClim helps airlines reduce costly weather-related delays with predictive routing intelligence—saving time, fuel, and operational costs.',
-  keywords: ['aviation weather', 'flight planning', 'storm tracking', 'airline operations', 'weather optimization', 'flight delay prevention'],
-  authors: [{ name: 'FlyClim' }],
-  creator: 'FlyClim',
-  publisher: 'FlyClim',
+  description:
+    "FlyClim helps airlines reduce costly weather-related delays with predictive routing intelligence—saving time, fuel, and operational costs.",
+  keywords: [
+    "aviation weather",
+    "flight planning",
+    "storm tracking",
+    "airline operations",
+    "weather optimization",
+    "flight delay prevention",
+  ],
+  authors: [{ name: "FlyClim" }],
+  creator: "FlyClim",
+  publisher: "FlyClim",
   robots: {
     index: true,
     follow: true,
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
   openGraph: {
-    type: 'website',
-    locale: 'en_US',
-    url: new URL('https://www.flyclim.com'),
-    siteName: 'FlyClim',
-    title: 'FlyClim | AI-Powered Weather Optimization',
-    description: 'FlyClim helps airlines reduce costly weather-related delays with predictive routing intelligence—saving time, fuel, and operational costs.',
+    type: "website",
+    locale: "en_US",
+    url: new URL("https://www.flyclim.com"),
+    siteName: "FlyClim",
+    title: "FlyClim | AI-Powered Weather Optimization",
+    description:
+      "FlyClim helps airlines reduce costly weather-related delays with predictive routing intelligence—saving time, fuel, and operational costs.",
     images: [
       {
-        url: '/logo.png',
+        url: "/logo.png",
         width: 1200,
         height: 630,
-        alt: 'FlyClim',
+        alt: "FlyClim",
       },
     ],
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'FlyClim | AI-Powered Weather Optimization',
-    description: 'FlyClim helps airlines reduce costly weather-related delays with predictive routing intelligence—saving time, fuel, and operational costs.',
-    images: ['/logo.png'],
-    creator: '@flyclim',
+    card: "summary_large_image",
+    title: "FlyClim | AI-Powered Weather Optimization",
+    description:
+      "FlyClim helps airlines reduce costly weather-related delays with predictive routing intelligence—saving time, fuel, and operational costs.",
+    images: ["/logo.png"],
+    creator: "@flyclim",
   },
   viewport: {
-    width: 'device-width',
+    width: "device-width",
     initialScale: 1,
     maximumScale: 1,
   },
   icons: {
     icon: [
-      { url: '/logo.png' },
-      { url: '/logo.png', sizes: '16x16', type: 'image/png' },
-      { url: '/logo.png', sizes: '32x32', type: 'image/png' },
+      { url: "/logo.png" },
+      { url: "/logo.png", sizes: "16x16", type: "image/png" },
+      { url: "/logo.png", sizes: "32x32", type: "image/png" },
     ],
-    apple: [
-      { url: '/logo.png' },
-    ],
+    apple: [{ url: "/logo.png" }],
     other: [
       {
-        rel: 'mask-icon',
-        url: '/logo.png',
-        color: '#5bbad5'
+        rel: "mask-icon",
+        url: "/logo.png",
+        color: "#5bbad5",
       },
     ],
   },
-  manifest: '/site.webmanifest',
+  manifest: "/site.webmanifest",
   other: {
-    'msapplication-TileColor': '#2d89ef',
-    'theme-color': '#ffffff',
+    "msapplication-TileColor": "#2d89ef",
+    "theme-color": "#ffffff",
   },
 };
 
@@ -92,7 +100,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-
         {/* Google Tag Manager */}
         <Script id="google-tag-manager" strategy="afterInteractive">
           {`
@@ -105,7 +112,12 @@ export default function RootLayout({
         </Script>
 
         {/* HubSpot */}
-        <Script id="hs-script-loader" async defer src="//js.hs-scripts.com/145986844.js" />
+        <Script
+          id="hs-script-loader"
+          async
+          defer
+          src="//js.hs-scripts.com/145986844.js"
+        />
 
         {/* Google Analytics */}
         <Script
@@ -128,7 +140,7 @@ export default function RootLayout({
             src="https://www.googletagmanager.com/ns.html?id=G-4ZBEPGDW9Z"
             height="0"
             width="0"
-            style={{ display: 'none', visibility: 'hidden' }}
+            style={{ display: "none", visibility: "hidden" }}
           />
         </noscript>
         <NextAuthProvider>
@@ -136,7 +148,17 @@ export default function RootLayout({
           <ProductJsonLd />
           {children}
         </NextAuthProvider>
-        <CookieBanner />
+        {/* <CookieBanner /> */}
+        <script
+          async
+          src="https://web.cmp.usercentrics.eu/modules/autoblocker.js"
+        ></script>
+        <script
+          id="usercentrics-cmp"
+          src="https://web.cmp.usercentrics.eu/ui/loader.js"
+          data-settings-id="0Vn0tKC72pIfR-"
+          async
+        ></script>
       </body>
     </html>
   );
