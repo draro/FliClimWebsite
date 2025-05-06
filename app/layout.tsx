@@ -101,7 +101,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         {/* Google Tag Manager */}
-        <Script id="google-tag-manager" strategy="afterInteractive">
+        {/* <Script id="google-tag-manager" strategy="afterInteractive">
           {`
             (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
             new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -109,6 +109,44 @@ export default function RootLayout({
             'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
             })(window,document,'script','dataLayer','G-4ZBEPGDW9Z');
           `}
+        </Script> */}
+        <Script type="text/javascript" id="dataLayer">
+          {`
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+
+        gtag("consent", "default", {
+            ad_user_data: "denied",
+            ad_personalization: "denied",
+            ad_storage: "denied",
+            analytics_storage: "denied",
+            wait_for_update: 2000 // milliseconds to wait for update
+        });
+
+        // Enable ads data redaction by default [optional]
+        gtag("set", "ads_data_redaction", true); 
+        `}
+        </Script>
+
+        <Script type="text/javascript" id="google-tag-manager">
+          {`
+        (function(w, d, s, l, i) {
+            w[l] = w[l] || [];
+            w[l].push({
+                'gtm.start': new Date().getTime(),
+                event: 'gtm.js'
+            });
+            var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s),
+                dl = l != 'dataLayer' ? '&l=' + l : '';
+            j.async = true;
+            j.src =
+                'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+            f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'G-4ZBEPGDW9Z'); //replace GTM-XXXXXX with Google Tag Manager ID
+        `}
         </Script>
 
         {/* HubSpot */}
@@ -132,7 +170,12 @@ export default function RootLayout({
             gtag('config', 'G-4ZBEPGDW9Z');
           `}
         </Script>
-        <script id="usercentrics-cmp" src="https://web.cmp.usercentrics.eu/ui/loader.js" data-settings-id="0Vn0tKC72pIfR-" async></script>
+        <script
+          id="usercentrics-cmp"
+          src="https://web.cmp.usercentrics.eu/ui/loader.js"
+          data-settings-id="0Vn0tKC72pIfR-"
+          async
+        ></script>
       </head>
       <body className={inter.className}>
         {/* Google Tag Manager (noscript) */}
@@ -149,7 +192,6 @@ export default function RootLayout({
           <ProductJsonLd />
           {children}
         </NextAuthProvider>
-        
       </body>
     </html>
   );
