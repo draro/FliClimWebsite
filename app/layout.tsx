@@ -120,6 +120,7 @@ export default function RootLayout({
             gtag('config', 'G-4ZBEPGDW9Z');
           `}
         </Script>
+        <script id="usercentrics-cmp" src="https://web.cmp.usercentrics.eu/ui/loader.js" data-settings-id="0Vn0tKC72pIfR-" async></script>
       </head>
       <body className={inter.className}>
         {/* Google Tag Manager (noscript) */}
@@ -136,7 +137,7 @@ export default function RootLayout({
           <ProductJsonLd />
           {children}
         </NextAuthProvider>
-        <CookieBanner />
+        
       </body>
     </html>
   );
