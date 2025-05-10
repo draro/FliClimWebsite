@@ -101,16 +101,8 @@ export default function RootLayout({
     <html lang="en">
       <head>
         {/* Google Tag Manager */}
-        {/* <Script id="google-tag-manager" strategy="afterInteractive">
-          {`
-            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer','G-4ZBEPGDW9Z');
-          `}
-        </Script> */}
-        <Script type="text/javascript" id="dataLayer">
+       
+        {/* <Script type="text/javascript" id="dataLayer" strategy="afterInteractive">
           {`
         window.dataLayer = window.dataLayer || [];
         function gtag() {
@@ -118,10 +110,14 @@ export default function RootLayout({
         }
 
         gtag("consent", "default", {
-            ad_user_data: "denied",
-            ad_personalization: "denied",
-            ad_storage: "denied",
-            analytics_storage: "denied",
+            ad_user_data: "granted",
+            ad_personalization: "granted",
+            ad_storage: "granted",
+            analytics_storage: "granted",
+            analytics_storage: "granted",
+            functionality_storage: "granted",
+            security_storage: "granted",
+            personalization_storage: "granted",
             wait_for_update: 2000 // milliseconds to wait for update
         });
 
@@ -130,7 +126,7 @@ export default function RootLayout({
         `}
         </Script>
 
-        <Script type="text/javascript" id="google-tag-manager">
+        <Script type="text/javascript" id="google-tag-manager" strategy="afterInteractive">
           {`
         (function(w, d, s, l, i) {
             w[l] = w[l] || [];
@@ -147,21 +143,65 @@ export default function RootLayout({
             f.parentNode.insertBefore(j, f);
         })(window, document, 'script', 'dataLayer', 'G-4ZBEPGDW9Z'); //replace GTM-XXXXXX with Google Tag Manager ID
         `}
-        </Script>
+        </Script> */}
 
+    {/* <Script src="https://web.cmp.usercentrics.eu/modules/autoblocker.js"></Script>
+    <Script id="usercentrics-cmp" src="https://web.cmp.usercentrics.eu/ui/loader.js" data-settings-id="0Vn0tKC72pIfR-" async></Script> */}
         {/* HubSpot */}
-        <Script
+        {/* <Script
           id="hs-script-loader"
           async
           defer
           src="//js.hs-scripts.com/145986844.js"
-        />
+        /> */}
+         <Script id="google-tag-manager" strategy="afterInteractive">
+          {`
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','GTM-KRPH2498');
+          `}
+        </Script>
+<Script src="https://www.googletagmanager.com/gtag/js?id=G-4ZBEPGDW9Z" strategy="afterInteractive" />
 
+<Script id="ga-consent" strategy="afterInteractive">
+  {`
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+
+    // Consent Mode v2: Set defaults (denied before user consents)
+    gtag('consent', 'default', {
+      ad_storage: 'granted',
+      analytics_storage: 'granted',
+      ad_user_data: 'granted',
+      ad_personalization: 'granted',
+      functionality_storage: 'granted',
+      security_storage: 'granted',
+      personalization_storage: 'granted',
+      wait_for_update: 2000
+    });
+
+    gtag('set', 'ads_data_redaction', true);
+
+    gtag('js', new Date());
+    gtag('config', 'G-4ZBEPGDW9Z');
+  `}
+</Script>
+
+<Script
+  id="usercentrics-cmp"
+  src="https://web.cmp.usercentrics.eu/ui/loader.js"
+  data-settings-id="0Vn0tKC72pIfR-"
+  async
+        ></Script>
+        
+        
         {/* Google Analytics */}
-        <Script
+        {/* <Script
           src={`https://www.googletagmanager.com/gtag/js?id=G-4ZBEPGDW9Z`}
           strategy="afterInteractive"
-        />
+        /> */}
         <Script id="google-analytics" strategy="afterInteractive">
           {`
             window.dataLayer = window.dataLayer || [];
