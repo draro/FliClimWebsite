@@ -4,19 +4,20 @@ const path = require('path');
 const DOMAIN = 'https://flyclim.com';
 
 const routes = [
-    '',
-    '/about',
-    '/solutions',
-    '/team',
-    '/pilot-program',
-    '/contact',
-    '/demo',
-    '/privacy',
-    '/terms'
+  '',
+  '/about',
+  '/solutions',
+  '/team',
+  '/pilot-program',
+  '/contact',
+  '/demo',
+  '/privacy',
+  '/terms',
+  '/app'
 ];
 
 const generateSitemap = () => {
-    const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   ${routes.map(route => `
     <url>
@@ -28,13 +29,13 @@ const generateSitemap = () => {
   `).join('')}
 </urlset>`;
 
-    const publicDir = path.join(process.cwd(), 'public');
-    if (!fs.existsSync(publicDir)) {
-        fs.mkdirSync(publicDir, { recursive: true });
-    }
+  const publicDir = path.join(process.cwd(), 'public');
+  if (!fs.existsSync(publicDir)) {
+    fs.mkdirSync(publicDir, { recursive: true });
+  }
 
-    fs.writeFileSync(path.join(publicDir, 'sitemap.xml'), sitemap);
-    console.log('✅ Sitemap generated successfully!');
+  fs.writeFileSync(path.join(publicDir, 'sitemap.xml'), sitemap);
+  console.log('✅ Sitemap generated successfully!');
 };
 
 generateSitemap();

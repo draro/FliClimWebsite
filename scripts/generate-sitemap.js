@@ -18,7 +18,8 @@ const staticRoutes = [
   '/contact',
   '/demo',
   '/privacy',
-  '/terms'
+  '/terms',
+  '/app'
 ];
 
 async function generateSitemap() {
