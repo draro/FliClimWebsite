@@ -38,8 +38,17 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export function FlyClimApp() {
+  const router = useRouter();
+
+  const handleEarlyAccess = () => {
+    router.push(
+      "/contact?subject=general&message=I%20am%20interested%20in%20early%20access%20to%20the%20FlyClim%20App.%20Please%20provide%20more%20information%20about%20availability%20and%20features."
+    );
+  };
+
   const features = [
     {
       category: "Flight Planning",
@@ -224,7 +233,7 @@ export function FlyClimApp() {
                 logbook capabilities in one powerful platform.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" className="group">
+                <Button size="lg" className="group" onClick={handleEarlyAccess}>
                   <Download className="h-5 w-5 mr-2" />
                   Get Early Access
                   <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -620,7 +629,12 @@ export function FlyClimApp() {
               weather intelligence.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" variant="secondary" className="group">
+              <Button
+                size="lg"
+                variant="secondary"
+                className="group"
+                onClick={handleEarlyAccess}
+              >
                 <Download className="h-5 w-5 mr-2" />
                 Join Waitlist
                 <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
