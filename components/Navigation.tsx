@@ -1,28 +1,29 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Menu, X } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Menu, X } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
   const navItems = [
-    { label: 'About', href: '/about' },
-    { label: 'Solutions', href: '/solutions' },
-    { label: 'Team', href: '/team' },
-    { label: 'Blog', href: '/blog' },
-    { label: 'News', href: '/news' },
-    { label: 'Pilot Program', href: '/pilot-program' },
-    { label: 'Contact', href: '/contact' },
+    { label: "About", href: "/about" },
+    { label: "Solutions", href: "/solutions" },
+    { label: "App", href: "/app" },
+    { label: "Team", href: "/team" },
+    { label: "Blog", href: "/blog" },
+    { label: "News", href: "/news" },
+    { label: "Pilot Program", href: "/pilot-program" },
+    { label: "Contact", href: "/contact" },
   ];
 
   const isActive = (href: string) => {
-    if (href === '/') return pathname === '/';
+    if (href === "/") return pathname === "/";
     return pathname.startsWith(href);
   };
 
@@ -51,8 +52,8 @@ export function Navigation() {
                 href={item.href}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   isActive(item.href)
-                    ? 'text-blue-600'
-                    : 'text-gray-700 hover:text-blue-600'
+                    ? "text-blue-600"
+                    : "text-gray-700 hover:text-blue-600"
                 }`}
               >
                 {item.label}
@@ -72,7 +73,11 @@ export function Navigation() {
               onClick={() => setIsOpen(!isOpen)}
               className="inline-flex items-center justify-center p-2"
             >
-              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {isOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
             </Button>
           </div>
         </div>
@@ -88,8 +93,8 @@ export function Navigation() {
                 href={item.href}
                 className={`block px-3 py-2 rounded-md text-base font-medium ${
                   isActive(item.href)
-                    ? 'text-blue-600'
-                    : 'text-gray-700 hover:text-blue-600'
+                    ? "text-blue-600"
+                    : "text-gray-700 hover:text-blue-600"
                 }`}
                 onClick={() => setIsOpen(false)}
               >
