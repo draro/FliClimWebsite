@@ -469,7 +469,7 @@ export function FlyClimApp() {
               Built for Professional Aviation
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              FlyClim App's core strengths make it the ideal choice for
+              FlyClim App&apos;s core strengths make it the ideal choice for
               professional pilots and aviation operations seeking efficiency and
               reliability.
             </p>
