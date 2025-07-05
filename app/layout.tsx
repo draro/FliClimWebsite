@@ -89,6 +89,7 @@ export const metadata: Metadata = {
   other: {
     "msapplication-TileColor": "#2d89ef",
     "theme-color": "#ffffff",
+    "apple-itunes-app": "app-id=6746156044",
   },
 };
 
@@ -101,7 +102,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         {/* Google Tag Manager */}
-       
+
         {/* <Script type="text/javascript" id="dataLayer" strategy="afterInteractive">
           {`
         window.dataLayer = window.dataLayer || [];
@@ -145,7 +146,7 @@ export default function RootLayout({
         `}
         </Script> */}
 
-    {/* <Script src="https://web.cmp.usercentrics.eu/modules/autoblocker.js"></Script>
+        {/* <Script src="https://web.cmp.usercentrics.eu/modules/autoblocker.js"></Script>
     <Script id="usercentrics-cmp" src="https://web.cmp.usercentrics.eu/ui/loader.js" data-settings-id="0Vn0tKC72pIfR-" async></Script> */}
         {/* HubSpot */}
         {/* <Script
@@ -154,7 +155,7 @@ export default function RootLayout({
           defer
           src="//js.hs-scripts.com/145986844.js"
         /> */}
-         <Script id="google-tag-manager" strategy="afterInteractive">
+        <Script id="google-tag-manager" strategy="afterInteractive">
           {`
             (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
             new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -163,10 +164,13 @@ export default function RootLayout({
             })(window,document,'script','dataLayer','GTM-KRPH2498');
           `}
         </Script>
-<Script src="https://www.googletagmanager.com/gtag/js?id=G-4ZBEPGDW9Z" strategy="afterInteractive" />
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-4ZBEPGDW9Z"
+          strategy="afterInteractive"
+        />
 
-<Script id="ga-consent" strategy="afterInteractive">
-  {`
+        <Script id="ga-consent" strategy="afterInteractive">
+          {`
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
 
@@ -187,16 +191,15 @@ export default function RootLayout({
     gtag('js', new Date());
     gtag('config', 'G-4ZBEPGDW9Z');
   `}
-</Script>
+        </Script>
 
-<Script
-  id="usercentrics-cmp"
-  src="https://web.cmp.usercentrics.eu/ui/loader.js"
-  data-settings-id="0Vn0tKC72pIfR-"
-  async
+        <Script
+          id="usercentrics-cmp"
+          src="https://web.cmp.usercentrics.eu/ui/loader.js"
+          data-settings-id="0Vn0tKC72pIfR-"
+          async
         ></Script>
-        
-        
+
         {/* Google Analytics */}
         {/* <Script
           src={`https://www.googletagmanager.com/gtag/js?id=G-4ZBEPGDW9Z`}
