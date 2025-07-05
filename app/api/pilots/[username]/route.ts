@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { MongoClient, ObjectId } from 'mongodb';
+import { MongoClient, ObjectId } from "mongodb";
 
 if (!process.env.MONGODB_URI) {
   throw new Error('Invalid/Missing environment variable: "MONGODB_URI"');
@@ -27,7 +27,7 @@ async function calculateFlightStatistics(db: any, pilotId: string) {
   const logbooks = await db
     .collection("logbooks")
     .find({
-      pilot:  new ObjectId(pilotId) ,
+      pilot: new ObjectId(pilotId),
     })
     .toArray();
 
@@ -54,7 +54,7 @@ async function calculateFlightStatistics(db: any, pilotId: string) {
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-  logbooks.forEach((entry) => {
+  logbooks.forEach((entry: any) => {
     // Parse flight times
     totalFlightTimeMinutes += parseTimeToMinutes(entry.totalFlightTime || "");
 
@@ -142,9 +142,22 @@ export async function GET(
     }
 
     // Base public data always available
-    const publicData = {
+    const publicData: {
+      _id: string;
+      user: any;
+      firstName: any;
+      lastName: any;
+      profileImage: any;
+      bio: any;
+      location: any;
+      airline: any;
+      publicProfile: any;
+      socialLinks: any;
+      createdAt: any;
+      [key: string]: any; // Allow additional properties like employers, certificates, etc.
+    } = {
       _id: pilot._id.toString(),
-      user:pilot.userId.toString(),
+      user: pilot.userId.toString(),
       firstName: pilot.firstName,
       lastName: pilot.lastName,
       profileImage: pilot.profileImage,
@@ -158,7 +171,7 @@ export async function GET(
 
     // Add optional fields based on privacy settings
     if (pilot.publicProfile.showEmployment && pilot.employers) {
-      publicData.employers = pilot.employers.map((emp) => ({
+      publicData.employers = pilot.employers.map((emp: any) => ({
         id: emp.id,
         name: emp.name,
         position: emp.position,
@@ -169,7 +182,7 @@ export async function GET(
     }
 
     if (pilot.publicProfile.showCertificates && pilot.certificates) {
-      publicData.certificates = pilot.certificates.map((cert) => ({
+      publicData.certificates = pilot.certificates.map((cert: any) => ({
         id: cert.id,
         type: cert.type,
         name: cert.name,
@@ -186,7 +199,7 @@ export async function GET(
     }
 
     // Calculate flight experience from logbooks if showFlightHours is enabled
-    console.log(pilot.userId)
+    console.log(pilot.userId);
     if (pilot.publicProfile.showFlightHours) {
       const flightStats = await calculateFlightStatistics(
         db,

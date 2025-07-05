@@ -60,19 +60,19 @@ export async function generateMetadata({
           pilot.bio ||
           `Professional pilot profile for ${pilot.firstName} ${pilot.lastName}`,
         images: pilot.profileImage ? [pilot.profileImage] : ["/logo.png"],
-        app: {
-          name: "FlyClim",
-          id: {
-            iphone: "123456789", // Replace with actual App Store ID
-            ipad: "123456789",
-            googleplay: "com.flyclim.app", // Replace with actual package name
-          },
-          url: {
-            iphone: `flyclim://pilot/${params.username}`,
-            ipad: `flyclim://pilot/${params.username}`,
-            googleplay: `flyclim://pilot/${params.username}`,
-          },
-        },
+        // app: {
+        //   name: "FlyClim",
+        //   id: {
+        //     iphone: "123456789", // Replace with actual App Store ID
+        //     ipad: "123456789",
+        //     googleplay: "com.flyclim.app", // Replace with actual package name
+        //   },
+        //   url: {
+        //     iphone: `flyclim://pilot/${params.username}`,
+        //     ipad: `flyclim://pilot/${params.username}`,
+        //     googleplay: `flyclim://pilot/${params.username}`,
+        //   },
+        // },
       },
     };
   } catch (error) {

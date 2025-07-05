@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useToast } from '@/hooks/use-toast';
-import { 
-  MapPin, 
-  Briefcase, 
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
+import {
+  MapPin,
+  Briefcase,
   Calendar,
   Mail,
   Clock,
@@ -23,11 +23,11 @@ import {
   Building,
   Timer,
   Target,
-  Smartphone
-} from 'lucide-react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { format } from 'date-fns';
+  Smartphone,
+} from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
+import { format } from "date-fns";
 
 interface PilotData {
   _id: string;
@@ -119,11 +119,11 @@ export function PilotProfile({ username }: PilotProfileProps) {
       const data = await response.json();
       setPilot(data);
     } catch (error) {
-      console.error('Failed to fetch pilot:', error);
+      console.error("Failed to fetch pilot:", error);
       toast({
-        title: 'Error',
-        description: 'Failed to load pilot profile. Please try again later.',
-        variant: 'destructive',
+        title: "Error",
+        description: "Failed to load pilot profile. Please try again later.",
+        variant: "destructive",
       });
       setNotFound(true);
     } finally {
@@ -133,13 +133,13 @@ export function PilotProfile({ username }: PilotProfileProps) {
 
   const getSocialIcon = (platform: string) => {
     switch (platform) {
-      case 'linkedin':
+      case "linkedin":
         return <Linkedin className="h-5 w-5" />;
-      case 'twitter':
+      case "twitter":
         return <Twitter className="h-5 w-5" />;
-      case 'instagram':
+      case "instagram":
         return <Instagram className="h-5 w-5" />;
-      case 'website':
+      case "website":
         return <Globe className="h-5 w-5" />;
       default:
         return <Globe className="h-5 w-5" />;
@@ -148,7 +148,7 @@ export function PilotProfile({ username }: PilotProfileProps) {
 
   const formatDate = (dateString: string) => {
     try {
-      return format(new Date(dateString), 'MMM yyyy');
+      return format(new Date(dateString), "MMM yyyy");
     } catch {
       return dateString;
     }
@@ -156,7 +156,7 @@ export function PilotProfile({ username }: PilotProfileProps) {
 
   const formatFullDate = (dateString: string) => {
     try {
-      return format(new Date(dateString), 'MMM d, yyyy');
+      return format(new Date(dateString), "MMM d, yyyy");
     } catch {
       return dateString;
     }
@@ -203,9 +203,12 @@ export function PilotProfile({ username }: PilotProfileProps) {
       <div className="pt-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
           <Plane className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Pilot Not Found</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">
+            Pilot Not Found
+          </h1>
           <p className="text-gray-600 mb-8">
-            The pilot profile you're looking for doesn't exist or is not publicly available.
+            The pilot profile you&apos;re looking for doesn&apos;t exist or is
+            not publicly available.
           </p>
           <Link href="/pilot" passHref>
             <Button>
@@ -258,14 +261,15 @@ export function PilotProfile({ username }: PilotProfileProps) {
                   </div>
                 ) : (
                   <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-3xl mx-auto mb-4">
-                    {pilot.firstName[0]}{pilot.lastName[0]}
+                    {pilot.firstName[0]}
+                    {pilot.lastName[0]}
                   </div>
                 )}
-                
+
                 <h1 className="text-2xl font-bold text-gray-900 mb-2">
                   {pilot.firstName} {pilot.lastName}
                 </h1>
-                
+
                 <Badge variant="secondary" className="mb-4">
                   {pilot.airline}
                 </Badge>
@@ -275,18 +279,23 @@ export function PilotProfile({ username }: PilotProfileProps) {
                     <MapPin className="h-4 w-4" />
                     <span className="text-sm">{pilot.location}</span>
                   </div>
-                  
+
                   {pilot.publicProfile.showFlightHours && pilot.experience && (
                     <div className="flex items-center gap-2 text-gray-600">
                       <Clock className="h-4 w-4" />
-                      <span className="text-sm">{pilot.experience.totalFlightTime} total hours</span>
+                      <span className="text-sm">
+                        {pilot.experience.totalFlightTime} total hours
+                      </span>
                     </div>
                   )}
 
                   {pilot.publicProfile.showContactInfo && pilot.email && (
                     <div className="flex items-center gap-2 text-gray-600">
                       <Mail className="h-4 w-4" />
-                      <a href={`mailto:${pilot.email}`} className="text-sm hover:text-blue-600">
+                      <a
+                        href={`mailto:${pilot.email}`}
+                        className="text-sm hover:text-blue-600"
+                      >
                         {pilot.email}
                       </a>
                     </div>
@@ -295,7 +304,7 @@ export function PilotProfile({ username }: PilotProfileProps) {
                   <div className="flex items-center gap-2 text-gray-600">
                     <Calendar className="h-4 w-4" />
                     <span className="text-sm">
-                      Joined {format(new Date(pilot.createdAt), 'MMMM yyyy')}
+                      Joined {format(new Date(pilot.createdAt), "MMMM yyyy")}
                     </span>
                   </div>
                 </div>
@@ -303,20 +312,22 @@ export function PilotProfile({ username }: PilotProfileProps) {
                 {/* Social Links */}
                 {pilot.socialLinks && (
                   <div className="flex justify-center gap-3 mt-6 pt-6 border-t">
-                    {Object.entries(pilot.socialLinks).map(([platform, url]) => {
-                      if (!url) return null;
-                      return (
-                        <a
-                          key={platform}
-                          href={url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
-                        >
-                          {getSocialIcon(platform)}
-                        </a>
-                      );
-                    })}
+                    {Object.entries(pilot.socialLinks).map(
+                      ([platform, url]) => {
+                        if (!url) return null;
+                        return (
+                          <a
+                            key={platform}
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+                          >
+                            {getSocialIcon(platform)}
+                          </a>
+                        );
+                      }
+                    )}
                   </div>
                 )}
 
@@ -326,13 +337,19 @@ export function PilotProfile({ username }: PilotProfileProps) {
                     variant="outline"
                     className="w-full"
                     onClick={() => {
-                      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                      const isMobile =
+                        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+                          navigator.userAgent
+                        );
                       if (isMobile) {
                         const deepLinkUrl = `flyclim://pilot/${pilot.publicProfile.username}`;
                         window.location.href = deepLinkUrl;
                       } else {
                         // Show download options for desktop users
-                        window.open('https://apps.apple.com/app/flyclim/id123456789', '_blank');
+                        window.open(
+                          "https://apps.apple.com/app/flyclim/id123456789",
+                          "_blank"
+                        );
                       }
                     }}
                   >
@@ -353,7 +370,9 @@ export function PilotProfile({ username }: PilotProfileProps) {
           >
             {/* Bio */}
             <Card className="p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">About</h2>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                About
+              </h2>
               <p className="text-gray-600 leading-relaxed">{pilot.bio}</p>
             </Card>
 
@@ -367,106 +386,157 @@ export function PilotProfile({ username }: PilotProfileProps) {
                 <div className="space-y-8">
                   {/* Primary Flight Time Stats */}
                   <div className="space-y-4">
-                    <h3 className="font-semibold text-gray-900 mb-3">Flight Time Summary</h3>
+                    <h3 className="font-semibold text-gray-900 mb-3">
+                      Flight Time Summary
+                    </h3>
                     <div className="grid md:grid-cols-2 gap-4">
-                    <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
-                      <span className="text-gray-700 font-medium">Total Flight Time</span>
-                      <span className="text-blue-600 font-bold text-lg">{pilot.experience.totalFlightTime}</span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                      <span className="text-gray-700 font-medium">PIC Time</span>
-                      <span className="text-green-600 font-bold">{pilot.experience.picTime}</span>
-                    </div>
+                      <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                        <span className="text-gray-700 font-medium">
+                          Total Flight Time
+                        </span>
+                        <span className="text-blue-600 font-bold text-lg">
+                          {pilot.experience.totalFlightTime}
+                        </span>
+                      </div>
 
-                    <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
-                      <span className="text-gray-700 font-medium">Total Flights</span>
-                      <span className="text-purple-600 font-bold">{pilot.experience.totalFlights.toLocaleString()}</span>
-                    </div>
+                      <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                        <span className="text-gray-700 font-medium">
+                          PIC Time
+                        </span>
+                        <span className="text-green-600 font-bold">
+                          {pilot.experience.picTime}
+                        </span>
+                      </div>
 
-                    <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
-                      <span className="text-gray-700 font-medium">Last 30 Days</span>
-                      <span className="text-orange-600 font-bold">{pilot.experience.last30Days} hours</span>
-                    </div>
+                      <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
+                        <span className="text-gray-700 font-medium">
+                          Total Flights
+                        </span>
+                        <span className="text-purple-600 font-bold">
+                          {pilot.experience.totalFlights.toLocaleString()}
+                        </span>
+                      </div>
+
+                      <div className="flex justify-between items-center p-3 bg-orange-50 rounded-lg">
+                        <span className="text-gray-700 font-medium">
+                          Last 30 Days
+                        </span>
+                        <span className="text-orange-600 font-bold">
+                          {pilot.experience.last30Days} hours
+                        </span>
+                      </div>
                     </div>
                   </div>
 
                   {/* Detailed Flight Time Breakdown */}
                   <div className="space-y-4">
-                    <h3 className="font-semibold text-gray-900 mb-3">Detailed Flight Time</h3>
+                    <h3 className="font-semibold text-gray-900 mb-3">
+                      Detailed Flight Time
+                    </h3>
                     <div className="grid md:grid-cols-2 gap-3">
-                    {pilot.experience.sicTime && (
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">SIC Time:</span>
-                        <span className="font-medium">{pilot.experience.sicTime}</span>
-                      </div>
-                    )}
-                    {pilot.experience.dualTime && (
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Dual Time:</span>
-                        <span className="font-medium">{pilot.experience.dualTime}</span>
-                      </div>
-                    )}
-                    {pilot.experience.soloTime && (
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Solo Time:</span>
-                        <span className="font-medium">{pilot.experience.soloTime}</span>
-                      </div>
-                    )}
-                    {pilot.experience.crossCountryTime && (
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Cross Country:</span>
-                        <span className="font-medium">{pilot.experience.crossCountryTime}</span>
-                      </div>
-                    )}
-                    {pilot.experience.nightTime && (
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Night Time:</span>
-                        <span className="font-medium">{pilot.experience.nightTime}</span>
-                      </div>
-                    )}
-                    {pilot.experience.instrumentTime && (
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Instrument Time:</span>
-                        <span className="font-medium">{pilot.experience.instrumentTime}</span>
-                      </div>
-                    )}
-                    {pilot.experience.simulatorTime && (
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Simulator Time:</span>
-                        <span className="font-medium">{pilot.experience.simulatorTime}</span>
-                      </div>
-                    )}
-                    {pilot.experience.dualGivenTime && (
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Dual Given:</span>
-                        <span className="font-medium">{pilot.experience.dualGivenTime}</span>
-                      </div>
-                    )}
-                    {pilot.experience.dualReceivedTime && (
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Dual Received:</span>
-                        <span className="font-medium">{pilot.experience.dualReceivedTime}</span>
-                      </div>
-                    )}
+                      {pilot.experience.sicTime && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">SIC Time:</span>
+                          <span className="font-medium">
+                            {pilot.experience.sicTime}
+                          </span>
+                        </div>
+                      )}
+                      {pilot.experience.dualTime && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Dual Time:</span>
+                          <span className="font-medium">
+                            {pilot.experience.dualTime}
+                          </span>
+                        </div>
+                      )}
+                      {pilot.experience.soloTime && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Solo Time:</span>
+                          <span className="font-medium">
+                            {pilot.experience.soloTime}
+                          </span>
+                        </div>
+                      )}
+                      {pilot.experience.crossCountryTime && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Cross Country:</span>
+                          <span className="font-medium">
+                            {pilot.experience.crossCountryTime}
+                          </span>
+                        </div>
+                      )}
+                      {pilot.experience.nightTime && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Night Time:</span>
+                          <span className="font-medium">
+                            {pilot.experience.nightTime}
+                          </span>
+                        </div>
+                      )}
+                      {pilot.experience.instrumentTime && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">
+                            Instrument Time:
+                          </span>
+                          <span className="font-medium">
+                            {pilot.experience.instrumentTime}
+                          </span>
+                        </div>
+                      )}
+                      {pilot.experience.simulatorTime && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Simulator Time:</span>
+                          <span className="font-medium">
+                            {pilot.experience.simulatorTime}
+                          </span>
+                        </div>
+                      )}
+                      {pilot.experience.dualGivenTime && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Dual Given:</span>
+                          <span className="font-medium">
+                            {pilot.experience.dualGivenTime}
+                          </span>
+                        </div>
+                      )}
+                      {pilot.experience.dualReceivedTime && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Dual Received:</span>
+                          <span className="font-medium">
+                            {pilot.experience.dualReceivedTime}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
 
                   {/* Landings */}
-                  {(pilot.experience.dayLandings !== undefined || pilot.experience.nightLandings !== undefined) && (
+                  {(pilot.experience.dayLandings !== undefined ||
+                    pilot.experience.nightLandings !== undefined) && (
                     <div className="space-y-4">
-                      <h3 className="font-semibold text-gray-900 mb-3">Landings</h3>
+                      <h3 className="font-semibold text-gray-900 mb-3">
+                        Landings
+                      </h3>
                       <div className="grid md:grid-cols-2 gap-4">
                         {pilot.experience.dayLandings !== undefined && (
                           <div className="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
-                            <span className="text-gray-700 font-medium">Day Landings</span>
-                            <span className="text-yellow-600 font-bold">{pilot.experience.dayLandings.toLocaleString()}</span>
+                            <span className="text-gray-700 font-medium">
+                              Day Landings
+                            </span>
+                            <span className="text-yellow-600 font-bold">
+                              {pilot.experience.dayLandings.toLocaleString()}
+                            </span>
                           </div>
                         )}
                         {pilot.experience.nightLandings !== undefined && (
                           <div className="flex justify-between items-center p-3 bg-indigo-50 rounded-lg">
-                            <span className="text-gray-700 font-medium">Night Landings</span>
-                            <span className="text-indigo-600 font-bold">{pilot.experience.nightLandings.toLocaleString()}</span>
+                            <span className="text-gray-700 font-medium">
+                              Night Landings
+                            </span>
+                            <span className="text-indigo-600 font-bold">
+                              {pilot.experience.nightLandings.toLocaleString()}
+                            </span>
                           </div>
                         )}
                       </div>
@@ -474,135 +544,201 @@ export function PilotProfile({ username }: PilotProfileProps) {
                   )}
 
                   {/* Aircraft Types */}
-                  {pilot.experience.aircraftTypes && pilot.experience.aircraftTypes.length > 0 && (
-                    <div className="space-y-4">
-                      <h3 className="font-semibold text-gray-900 mb-3">Aircraft Types Flown</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {pilot.experience.aircraftTypes.map((aircraft, index) => (
-                          <Badge key={index} variant="outline" className="bg-gray-50">
-                            {aircraft}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Visited Airports */}
-                  {pilot.experience.visitedAirports && pilot.experience.visitedAirports.length > 0 && (
-                    <div className="space-y-4">
-                      <h3 className="font-semibold text-gray-900 mb-3">
-                        Airports Visited ({pilot.experience.visitedAirports.length})
-                      </h3>
-                      <div className="max-h-32 overflow-y-auto">
+                  {pilot.experience.aircraftTypes &&
+                    pilot.experience.aircraftTypes.length > 0 && (
+                      <div className="space-y-4">
+                        <h3 className="font-semibold text-gray-900 mb-3">
+                          Aircraft Types Flown
+                        </h3>
                         <div className="flex flex-wrap gap-2">
-                          {pilot.experience.visitedAirports.map((airport, index) => (
-                            <Badge key={index} variant="secondary" className="text-xs">
-                              {airport}
-                            </Badge>
-                          ))}
+                          {pilot.experience.aircraftTypes.map(
+                            (aircraft, index) => (
+                              <Badge
+                                key={index}
+                                variant="outline"
+                                className="bg-gray-50"
+                              >
+                                {aircraft}
+                              </Badge>
+                            )
+                          )}
                         </div>
                       </div>
-                    </div>
-                  )}
+                    )}
+
+                  {/* Visited Airports */}
+                  {pilot.experience.visitedAirports &&
+                    pilot.experience.visitedAirports.length > 0 && (
+                      <div className="space-y-4">
+                        <h3 className="font-semibold text-gray-900 mb-3">
+                          Airports Visited (
+                          {pilot.experience.visitedAirports.length})
+                        </h3>
+                        <div className="max-h-32 overflow-y-auto">
+                          <div className="flex flex-wrap gap-2">
+                            {pilot.experience.visitedAirports.map(
+                              (airport, index) => (
+                                <Badge
+                                  key={index}
+                                  variant="secondary"
+                                  className="text-xs"
+                                >
+                                  {airport}
+                                </Badge>
+                              )
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
                 </div>
               </Card>
             )}
 
             {/* Employment History */}
-            {pilot.publicProfile.showEmployment && pilot.employers && pilot.employers.length > 0 && (
-              <Card className="p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                  <Briefcase className="h-5 w-5" />
-                  Employment History
-                </h2>
-                <div className="space-y-4">
-                  {pilot.employers.map((employer) => (
-                    <div key={employer.id} className="border-l-4 border-blue-200 pl-4 py-2">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Building className="h-4 w-4 text-gray-500" />
-                        <h3 className="font-semibold text-gray-900">{employer.name}</h3>
-                        {employer.current && (
-                          <Badge variant="default" className="text-xs">Current</Badge>
-                        )}
+            {pilot.publicProfile.showEmployment &&
+              pilot.employers &&
+              pilot.employers.length > 0 && (
+                <Card className="p-6">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <Briefcase className="h-5 w-5" />
+                    Employment History
+                  </h2>
+                  <div className="space-y-4">
+                    {pilot.employers.map((employer) => (
+                      <div
+                        key={employer.id}
+                        className="border-l-4 border-blue-200 pl-4 py-2"
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <Building className="h-4 w-4 text-gray-500" />
+                          <h3 className="font-semibold text-gray-900">
+                            {employer.name}
+                          </h3>
+                          {employer.current && (
+                            <Badge variant="default" className="text-xs">
+                              Current
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-gray-600 mb-1 font-medium">
+                          {employer.position}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          {formatDate(employer.startDate)} -{" "}
+                          {employer.endDate
+                            ? formatDate(employer.endDate)
+                            : "Present"}
+                        </p>
                       </div>
-                      <p className="text-gray-600 mb-1 font-medium">{employer.position}</p>
-                      <p className="text-sm text-gray-500">
-                        {formatDate(employer.startDate)} - {employer.endDate ? formatDate(employer.endDate) : 'Present'}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            )}
+                    ))}
+                  </div>
+                </Card>
+              )}
 
             {/* Certificates */}
-            {pilot.publicProfile.showCertificates && pilot.certificates && pilot.certificates.length > 0 && (
-              <Card className="p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                  <Award className="h-5 w-5" />
-                  Certificates & Licenses
-                </h2>
-                <div className="grid gap-4">
-                  {pilot.certificates.map((cert) => (
-                    <div key={cert.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                      <div className="flex justify-between items-start mb-3">
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900 mb-1">{cert.name}</h3>
-                          <div className="flex gap-2 mb-2">
-                            <Badge variant="outline" className="text-xs">
-                              {cert.type}
-                            </Badge>
-                            {cert.expiryDate && (
-                              <Badge 
-                                variant={isExpired(cert.expiryDate) ? "destructive" : "default"}
-                                className={isExpired(cert.expiryDate) ? "" : "bg-green-100 text-green-800"}
-                              >
-                                {isExpired(cert.expiryDate) ? 'Expired' : 'Valid'}
+            {pilot.publicProfile.showCertificates &&
+              pilot.certificates &&
+              pilot.certificates.length > 0 && (
+                <Card className="p-6">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <Award className="h-5 w-5" />
+                    Certificates & Licenses
+                  </h2>
+                  <div className="grid gap-4">
+                    {pilot.certificates.map((cert) => (
+                      <div
+                        key={cert.id}
+                        className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+                      >
+                        <div className="flex justify-between items-start mb-3">
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-gray-900 mb-1">
+                              {cert.name}
+                            </h3>
+                            <div className="flex gap-2 mb-2">
+                              <Badge variant="outline" className="text-xs">
+                                {cert.type}
                               </Badge>
-                            )}
+                              {cert.expiryDate && (
+                                <Badge
+                                  variant={
+                                    isExpired(cert.expiryDate)
+                                      ? "destructive"
+                                      : "default"
+                                  }
+                                  className={
+                                    isExpired(cert.expiryDate)
+                                      ? ""
+                                      : "bg-green-100 text-green-800"
+                                  }
+                                >
+                                  {isExpired(cert.expiryDate)
+                                    ? "Expired"
+                                    : "Valid"}
+                                </Badge>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Authority:</span>
-                          <span className="font-medium">{cert.authority}</span>
-                        </div>
-                        
-                        {cert.number && (
+
+                        <div className="space-y-2 text-sm">
                           <div className="flex justify-between">
-                            <span className="text-gray-600">Certificate #:</span>
-                            <span className="font-medium font-mono">{cert.number}</span>
-                          </div>
-                        )}
-                        
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Issued:</span>
-                          <span className="font-medium">{formatFullDate(cert.issueDate)}</span>
-                        </div>
-                        
-                        {cert.expiryDate && (
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">Expires:</span>
-                            <span className={`font-medium ${isExpired(cert.expiryDate) ? 'text-red-600' : ''}`}>
-                              {formatFullDate(cert.expiryDate)}
+                            <span className="text-gray-600">Authority:</span>
+                            <span className="font-medium">
+                              {cert.authority}
                             </span>
                           </div>
-                        )}
-                        
-                        {cert.notes && (
-                          <div className="mt-3 pt-3 border-t">
-                            <span className="text-gray-600 text-xs">Notes:</span>
-                            <p className="text-gray-700 text-xs mt-1">{cert.notes}</p>
+
+                          {cert.number && (
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">
+                                Certificate #:
+                              </span>
+                              <span className="font-medium font-mono">
+                                {cert.number}
+                              </span>
+                            </div>
+                          )}
+
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Issued:</span>
+                            <span className="font-medium">
+                              {formatFullDate(cert.issueDate)}
+                            </span>
                           </div>
-                        )}
+
+                          {cert.expiryDate && (
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Expires:</span>
+                              <span
+                                className={`font-medium ${
+                                  isExpired(cert.expiryDate)
+                                    ? "text-red-600"
+                                    : ""
+                                }`}
+                              >
+                                {formatFullDate(cert.expiryDate)}
+                              </span>
+                            </div>
+                          )}
+
+                          {cert.notes && (
+                            <div className="mt-3 pt-3 border-t">
+                              <span className="text-gray-600 text-xs">
+                                Notes:
+                              </span>
+                              <p className="text-gray-700 text-xs mt-1">
+                                {cert.notes}
+                              </p>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            )}
+                    ))}
+                  </div>
+                </Card>
+              )}
           </motion.div>
         </div>
       </div>
