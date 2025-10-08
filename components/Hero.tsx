@@ -18,9 +18,9 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          Avoid Flight Delays
+          Complete Aviation Solutions
           <br />
-          <span className="text-blue-600">Before They Happen</span>
+          <span className="text-blue-600">From Flight Planning to Digital AIP</span>
         </motion.h1>
 
         <motion.div
@@ -30,12 +30,11 @@ export function Hero() {
           transition={{ duration: 0.8, delay: 0.2 }}
         >
           <p className="text-xl text-gray-600">
-            AI-Powered Weather Optimization for Smarter Aviation Operations
+            AI-Powered Flight Optimization & Advanced eAIP System
           </p>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Join the future of aviation. FlyClim helps airlines reduce costly
-            weather-related delays with predictive routing intelligence—saving
-            time, fuel, and operational costs.
+            FlyClim offers two powerful solutions: AI-driven weather optimization to reduce flight delays,
+            and a comprehensive digital eAIP system for streamlined aeronautical information management.
           </p>
         </motion.div>
 
@@ -45,12 +44,14 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          <Link href="/pilot-program" passHref>
-            <Button size="lg">Join Our Pilot Program</Button>
+          <Link href="https://eaip.flyclim.com" target="_blank" rel="noopener noreferrer" passHref>
+            <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
+              Explore eAIP System
+            </Button>
           </Link>
-          <Link href="/demo" passHref>
+          <Link href="/pilot-program" passHref>
             <Button size="lg" variant="outline">
-              Try Live Demo
+              Join Pilot Program
             </Button>
           </Link>
         </motion.div>

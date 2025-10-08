@@ -5,18 +5,19 @@ import { Footer } from '@/components/Footer';
 
 export const metadata: Metadata = {
   title: 'Our Solutions',
-  description: 'Discover how FlyClim\'s AI-powered solutions help prevent flight delays and optimize routes.', alternates: {
+  description: 'Discover FlyClim\'s complete aviation solutions: AI-powered flight optimization to prevent delays and a comprehensive digital eAIP system for aeronautical information management.',
+  alternates: {
     canonical: `https://www.flyclim.com/solutions`,
   },
   openGraph: {
-    title: 'FlyClim Solutions - AI-Powered Flight Optimization',
-    description: 'Discover how FlyClim\'s AI-powered solutions help prevent flight delays and optimize routes.',
+    title: 'FlyClim Solutions - Flight Optimization & eAIP System',
+    description: 'Discover FlyClim\'s complete aviation solutions: AI-powered flight optimization and digital eAIP system.',
     images: ['/logo.png'],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'FlyClim Solutions - AI-Powered Flight Optimization',
-    description: 'Discover how FlyClim\'s AI-powered solutions help prevent flight delays and optimize routes.',
+    title: 'FlyClim Solutions - Flight Optimization & eAIP System',
+    description: 'Discover FlyClim\'s complete aviation solutions: AI-powered flight optimization and digital eAIP system.',
     images: ['/logo.png'],
   }
 };

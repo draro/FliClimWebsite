@@ -10,14 +10,14 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
-    default: "FlyClim | AI-Powered Weather Optimization",
+    default: "FlyClim | Flight Optimization & eAIP System",
     template: "%s | FlyClim",
   },
   alternates: {
     canonical: `https://www.flyclim.com`,
   },
   description:
-    "FlyClim helps airlines reduce costly weather-related delays with predictive routing intelligence—saving time, fuel, and operational costs.",
+    "FlyClim offers complete aviation solutions: AI-powered flight optimization to reduce weather-related delays and a comprehensive digital eAIP system for aeronautical information management.",
   keywords: [
     "aviation weather",
     "flight planning",
@@ -25,6 +25,11 @@ export const metadata: Metadata = {
     "airline operations",
     "weather optimization",
     "flight delay prevention",
+    "eAIP",
+    "electronic AIP",
+    "aeronautical information publication",
+    "digital AIP",
+    "aviation information management",
   ],
   authors: [{ name: "FlyClim" }],
   creator: "FlyClim",
@@ -45,9 +50,9 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: new URL("https://www.flyclim.com"),
     siteName: "FlyClim",
-    title: "FlyClim | AI-Powered Weather Optimization",
+    title: "FlyClim | Flight Optimization & eAIP System",
     description:
-      "FlyClim helps airlines reduce costly weather-related delays with predictive routing intelligence—saving time, fuel, and operational costs.",
+      "FlyClim offers complete aviation solutions: AI-powered flight optimization to reduce weather-related delays and a comprehensive digital eAIP system for aeronautical information management.",
     images: [
       {
         url: "/logo.png",
@@ -59,9 +64,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "FlyClim | AI-Powered Weather Optimization",
+    title: "FlyClim | Flight Optimization & eAIP System",
     description:
-      "FlyClim helps airlines reduce costly weather-related delays with predictive routing intelligence—saving time, fuel, and operational costs.",
+      "FlyClim offers complete aviation solutions: AI-powered flight optimization to reduce weather-related delays and a comprehensive digital eAIP system.",
     images: ["/logo.png"],
     creator: "@flyclim",
   },

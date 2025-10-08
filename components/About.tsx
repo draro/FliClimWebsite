@@ -17,6 +17,10 @@ export function About() {
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
             Built by Aviation Experts. Powered by Innovation.
           </h2>
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto mt-4">
+            From AI-powered flight optimization to comprehensive eAIP systems for Civil Aviation Authorities,
+            we deliver enterprise-grade aviation solutions backed by deep industry expertise.
+          </p>
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-12 mt-16">
