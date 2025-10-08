@@ -9,6 +9,7 @@ const nextConfig = {
     ],
     // domains: ['images.unsplash.com','www.flyclim.com'],
   },
+  output: 'standalone',
 }
 
 module.exports = nextConfig

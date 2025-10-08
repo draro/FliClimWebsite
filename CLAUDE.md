@@ -25,6 +25,36 @@ npm run lint
 npm run generate-sitemap
 ```
 
+## Docker Deployment
+
+The application is configured to run in Docker on port 3001.
+
+```bash
+# Build and start the container
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop the container
+docker-compose down
+
+# Rebuild and restart
+docker-compose up -d --build
+
+# Build Docker image only
+docker build -t flyclim-website .
+
+# Run container manually (without docker-compose)
+docker run -d -p 3001:3001 --env-file .env.local --name flyclim-website flyclim-website
+```
+
+**Important Notes:**
+- The application runs on port 3001 inside and outside the container
+- Environment variables are loaded from `.env.local`
+- The Docker image uses Next.js standalone output for optimized production builds
+- Health checks are configured to ensure container is running properly
+
 ## Architecture
 
 ### Tech Stack
