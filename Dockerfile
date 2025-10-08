@@ -53,8 +53,8 @@ ENV LINKEDIN_ACCESS_TOKEN=$LINKEDIN_ACCESS_TOKEN
 ENV LINKEDIN_ORGANIZATION_ID=$LINKEDIN_ORGANIZATION_ID
 ENV LINKEDIN_REDIRECT_URI=$LINKEDIN_REDIRECT_URI
 
-# Build the application
-RUN npm run build
+# Build the application (skip sitemap generation and PM2 reload for Docker)
+RUN npm run build:docker
 
 # Production image, copy all the files and run next
 FROM base AS runner

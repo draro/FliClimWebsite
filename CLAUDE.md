@@ -15,6 +15,9 @@ npm run dev
 # Build for production (includes sitemap generation, Next.js build, and PM2 reload)
 npm run build
 
+# Build for Docker (Next.js build only, no sitemap or PM2)
+npm run build:docker
+
 # Start production server
 npm run start
 
