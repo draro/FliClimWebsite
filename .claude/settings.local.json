@@ -6,7 +6,12 @@
       "Bash(./docker-build.sh:*)",
       "Bash(PORT=3001 npm run start)",
       "Bash(git add:*)",
-      "Bash(awk:*)"
+      "Bash(awk:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(npm update:*)",
+      "Bash(npm install:*)",
+      "Bash(npm audit:*)"
     ],
     "deny": [],
     "ask": []

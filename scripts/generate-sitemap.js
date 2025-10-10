@@ -21,8 +21,7 @@ const staticRoutes = [
   { path: '/blog', priority: '0.8', changefreq: 'weekly' },
   { path: '/news', priority: '0.8', changefreq: 'weekly' },
   { path: '/privacy', priority: '0.3', changefreq: 'yearly' },
-  { path: '/terms', priority: '0.3', changefreq: 'yearly' },
-  { path: '/app', priority: '0.5', changefreq: 'monthly' }
+  { path: '/terms', priority: '0.3', changefreq: 'yearly' }
 ];
 
 async function generateSitemap() {
