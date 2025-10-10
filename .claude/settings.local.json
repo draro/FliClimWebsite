@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:eaip.flyclim.com)"
+      "WebFetch(domain:eaip.flyclim.com)",
+      "Bash(chmod:*)",
+      "Bash(./docker-build.sh:*)"
     ],
     "deny": [],
     "ask": []
