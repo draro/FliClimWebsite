@@ -427,7 +427,7 @@ export default function EAIPPage() {
             Ready to Modernize Your AIP Management?
           </h2>
           <p className="text-xl text-blue-100 mb-10">
-            Join Civil Aviation Authorities worldwide who trust FlyClim's eAIP system for compliant,
+            Join Civil Aviation Authorities worldwide who trust FlyClim&apos;s eAIP system for compliant,
             efficient aeronautical information management.
           </p>
 
