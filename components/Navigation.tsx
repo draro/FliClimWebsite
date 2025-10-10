@@ -14,11 +14,11 @@ export function Navigation() {
   const navItems = [
     { label: "About", href: "/about" },
     { label: "Solutions", href: "/solutions" },
-    { label: "eAIP", href: "https://eaip.flyclim.com", external: true },
+    { label: "eAIP", href: "/eaip" },
+    { label: "eAIP Platform", href: "https://eaip.flyclim.com", external: true, featured: true },
     { label: "Team", href: "/team" },
     { label: "Blog", href: "/blog" },
     { label: "News", href: "/news" },
-    { label: "Pilot Program", href: "/pilot-program" },
     { label: "Contact", href: "/contact" },
   ];
 
@@ -28,7 +28,7 @@ export function Navigation() {
   };
 
   return (
-    <nav className="fixed w-full bg-white/95 backdrop-blur-sm z-50 shadow-sm">
+    <nav className="fixed w-full bg-white/95 backdrop-blur-sm z-50 shadow-sm" role="navigation" aria-label="Main navigation">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
@@ -53,7 +53,11 @@ export function Navigation() {
                   href={item.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3 py-2 rounded-md text-sm font-medium transition-colors text-gray-700 hover:text-blue-600"
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-all ${
+                    item.featured
+                      ? "bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg"
+                      : "text-gray-700 hover:text-blue-600"
+                  }`}
                 >
                   {item.label}
                 </a>
@@ -101,7 +105,11 @@ export function Navigation() {
                   href={item.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600"
+                  className={`block px-3 py-2 rounded-md text-base font-medium ${
+                    item.featured
+                      ? "bg-blue-600 text-white hover:bg-blue-700"
+                      : "text-gray-700 hover:text-blue-600"
+                  }`}
                   onClick={() => setIsOpen(false)}
                 >
                   {item.label}

@@ -4,32 +4,39 @@ import { Inter } from "next/font/google";
 import Script from "next/script";
 import { CookieBanner } from "@/components/CookieBanner";
 import { NextAuthProvider } from "@/components/NextAuthProvider";
-import { OrganizationJsonLd, ProductJsonLd } from "@/components/JsonLd";
+import { OrganizationJsonLd, ProductJsonLd, FAQJsonLd } from "@/components/JsonLd";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
-    default: "FlyClim | Flight Optimization & eAIP System",
+    default: "FlyClim | Electronic AIP (eAIP) System & Flight Optimization Solutions",
     template: "%s | FlyClim",
   },
   alternates: {
     canonical: `https://www.flyclim.com`,
   },
   description:
-    "FlyClim offers complete aviation solutions: AI-powered flight optimization to reduce weather-related delays and a comprehensive digital eAIP system for aeronautical information management.",
+    "Leading eAIP (Electronic Aeronautical Information Publication) system for Civil Aviation Authorities. ICAO Annex 15 compliant digital AIP management platform with automated NOTAM integration, AIRAC cycle management, and AI-powered flight weather optimization.",
   keywords: [
-    "aviation weather",
+    "eAIP system",
+    "electronic AIP",
+    "digital AIP",
+    "aeronautical information publication",
+    "ICAO Annex 15",
+    "EUROCONTROL Specification 3.0",
+    "civil aviation authority",
+    "AIP management",
+    "NOTAM integration",
+    "AIRAC cycle",
+    "aviation information management",
+    "AIS automation",
+    "aeronautical data quality",
+    "aviation weather optimization",
     "flight planning",
     "storm tracking",
     "airline operations",
-    "weather optimization",
     "flight delay prevention",
-    "eAIP",
-    "electronic AIP",
-    "aeronautical information publication",
-    "digital AIP",
-    "aviation information management",
   ],
   authors: [{ name: "FlyClim" }],
   creator: "FlyClim",
@@ -50,23 +57,23 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: new URL("https://www.flyclim.com"),
     siteName: "FlyClim",
-    title: "FlyClim | Flight Optimization & eAIP System",
+    title: "FlyClim | Electronic AIP (eAIP) System & Flight Optimization",
     description:
-      "FlyClim offers complete aviation solutions: AI-powered flight optimization to reduce weather-related delays and a comprehensive digital eAIP system for aeronautical information management.",
+      "ICAO-compliant eAIP system for Civil Aviation Authorities with automated NOTAM integration, AIRAC management, and AI-powered flight weather optimization. Enterprise-grade digital AIP platform.",
     images: [
       {
         url: "/logo.png",
         width: 1200,
         height: 630,
-        alt: "FlyClim",
+        alt: "FlyClim - Electronic AIP System and Flight Optimization Platform",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "FlyClim | Flight Optimization & eAIP System",
+    title: "FlyClim | Electronic AIP (eAIP) System & Flight Optimization",
     description:
-      "FlyClim offers complete aviation solutions: AI-powered flight optimization to reduce weather-related delays and a comprehensive digital eAIP system.",
+      "ICAO-compliant eAIP system for Civil Aviation Authorities with automated NOTAM integration, AIRAC management, and AI-powered flight weather optimization.",
     images: ["/logo.png"],
     creator: "@flyclim",
   },
@@ -238,6 +245,7 @@ export default function RootLayout({
         <NextAuthProvider>
           <OrganizationJsonLd />
           <ProductJsonLd />
+          <FAQJsonLd />
           {children}
         </NextAuthProvider>
       </body>

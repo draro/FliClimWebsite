@@ -15,11 +15,12 @@ export function About() {
           className="text-center mb-16"
         >
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Built by Aviation Experts. Powered by Innovation.
+            Trusted by Civil Aviation Authorities Worldwide
           </h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto mt-4">
-            From AI-powered flight optimization to comprehensive eAIP systems for Civil Aviation Authorities,
-            we deliver enterprise-grade aviation solutions backed by deep industry expertise.
+            Our enterprise-grade eAIP system serves Civil Aviation Authorities and Air Navigation Service Providers globally,
+            ensuring ICAO compliance and operational excellence. Plus AI-powered flight optimization solutions for airlines
+            backed by 15+ years of aviation expertise.
           </p>
         </motion.div>
 
@@ -34,9 +35,9 @@ export function About() {
             <div className="flex justify-center mb-6">
               <Globe2 className="h-12 w-12 text-blue-600" />
             </div>
-            <h3 className="text-xl font-semibold mb-4">Global Experience</h3>
+            <h3 className="text-xl font-semibold mb-4">ICAO & EUROCONTROL Certified</h3>
             <p className="text-gray-600">
-              Operating in 50+ countries with major airports and air navigation services
+              100% compliant with ICAO Annex 15 and EUROCONTROL Specification 3.0 standards for eAIP systems
             </p>
           </motion.div>
 
@@ -50,9 +51,9 @@ export function About() {
             <div className="flex justify-center mb-6">
               <Award className="h-12 w-12 text-blue-600" />
             </div>
-            <h3 className="text-xl font-semibold mb-4">15+ Years Experience</h3>
+            <h3 className="text-xl font-semibold mb-4">Enterprise-Grade Security</h3>
             <p className="text-gray-600">
-              Deep expertise in air traffic management and weather systems
+              SOC 2 compliant with 256-bit encryption, role-based access control, and 99.9% uptime SLA
             </p>
           </motion.div>
 
@@ -66,9 +67,9 @@ export function About() {
             <div className="flex justify-center mb-6">
               <Users className="h-12 w-12 text-blue-600" />
             </div>
-            <h3 className="text-xl font-semibold mb-4">Trusted Partners</h3>
+            <h3 className="text-xl font-semibold mb-4">Proven Track Record</h3>
             <p className="text-gray-600">
-              Working with leading airports and weather agencies worldwide
+              15+ years serving Civil Aviation Authorities, airports, and airlines across 50+ countries
             </p>
           </motion.div>
         </div>

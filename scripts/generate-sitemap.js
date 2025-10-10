@@ -8,18 +8,21 @@ const { MongoClient } = require('mongodb');
 const MONGODB_URI = "mongodb+srv://davide:!!!Sasha2015!!!Eliana2019!!!@flyclimweb.qj1barl.mongodb.net/?retryWrites=true&w=majority&appName=flyclimWeb&ssl=true"
 const DOMAIN = 'https://www.flyclim.com';
 
-// Static routes that are always included
+// Static routes with priority settings (higher priority for eAIP-related pages)
 const staticRoutes = [
-  '',
-  '/about',
-  '/solutions',
-  '/team',
-  '/pilot-program',
-  '/contact',
-  '/demo',
-  '/privacy',
-  '/terms',
-  '/app'
+  { path: '', priority: '1.0', changefreq: 'daily' },
+  { path: '/eaip', priority: '0.98', changefreq: 'weekly' },  // Dedicated eAIP page - highest priority
+  { path: '/solutions', priority: '0.95', changefreq: 'weekly' },  // eAIP featured here
+  { path: '/about', priority: '0.8', changefreq: 'weekly' },
+  { path: '/contact', priority: '0.8', changefreq: 'monthly' },
+  { path: '/team', priority: '0.7', changefreq: 'monthly' },
+  { path: '/pilot-program', priority: '0.7', changefreq: 'monthly' },
+  { path: '/demo', priority: '0.6', changefreq: 'monthly' },
+  { path: '/blog', priority: '0.8', changefreq: 'weekly' },
+  { path: '/news', priority: '0.8', changefreq: 'weekly' },
+  { path: '/privacy', priority: '0.3', changefreq: 'yearly' },
+  { path: '/terms', priority: '0.3', changefreq: 'yearly' },
+  { path: '/app', priority: '0.5', changefreq: 'monthly' }
 ];
 
 async function generateSitemap() {
@@ -36,12 +39,12 @@ async function generateSitemap() {
 
     // Generate URLs for all content
     const urls = [
-      // Static routes
+      // Static routes with custom priorities
       ...staticRoutes.map(route => ({
-        loc: `${DOMAIN}${route}`,
+        loc: `${DOMAIN}${route.path}`,
         lastmod: new Date().toISOString(),
-        changefreq: route === '' ? 'daily' : 'weekly',
-        priority: route === '' ? '1.0' : '0.8'
+        changefreq: route.changefreq,
+        priority: route.priority
       })),
 
       // Dynamic blog posts
