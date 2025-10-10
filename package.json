@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "PORT=3001 next dev",
     "build": "npm run generate-sitemap && next build && pm2 reload ecosystem.config.js",
     "build:docker": "npm run generate-sitemap && next build",
-    "start": "next start",
+    "start": "PORT=3001 next start",
+    "start:standalone": "PORT=3001 node .next/standalone/server.js",
     "lint": "next lint",
     "generate-sitemap": "node scripts/generate-sitemap.js"
   },

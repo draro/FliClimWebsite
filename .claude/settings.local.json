@@ -3,7 +3,10 @@
     "allow": [
       "WebFetch(domain:eaip.flyclim.com)",
       "Bash(chmod:*)",
-      "Bash(./docker-build.sh:*)"
+      "Bash(./docker-build.sh:*)",
+      "Bash(PORT=3001 npm run start)",
+      "Bash(git add:*)",
+      "Bash(awk:*)"
     ],
     "deny": [],
     "ask": []
